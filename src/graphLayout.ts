@@ -57,5 +57,5 @@ export function layoutGraph(graph: Graph) {
     set(node, 1125, middle);
   }
   const nodes = [...placed.values()];
-  return { nodes, byId: placed, width: Math.max(1350, ...nodes.map((node) => node.x + node.width + 35)), height: Math.max(800, ...nodes.map((node) => node.y + node.height + 50)) };
+  return { nodes, byId: placed, width: Math.max(350, ...nodes.map((node) => node.x + node.width + 35)), height: Math.max(400, ...nodes.map((node) => node.y + node.height + 50)) };
 }

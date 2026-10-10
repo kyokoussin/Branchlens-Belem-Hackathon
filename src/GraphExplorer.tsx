@@ -65,8 +65,13 @@ export function GraphExplorer({ position, portfolio, view, selectedId, onSelect,
     const node = layout.byId.get(selectedId);
     const el = viewport.current;
     if (!node || !el) return;
+    if (view === 'impact') {
+      setZoom(Math.max(0.35, Math.min(0.9, el.clientWidth / layout.width, el.clientHeight / layout.height)));
+      setOffset({ x: 12, y: 12 });
+      return;
+    }
     setOffset({ x: Math.min(80, el.clientWidth * 0.42 - node.x * zoom), y: el.clientHeight * 0.43 - node.y * zoom });
-  }, [selectedId, position.id, layout, zoom]);
+  }, [selectedId, position.id, layout, view]);
 
   function fit() {
     const el = viewport.current;
