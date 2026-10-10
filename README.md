@@ -4,7 +4,7 @@ A read-only hackathon prototype. It turns three **hypothetical investments** in 
 
 ## Public demo
 
-[Open the hosted judge demo](https://kyokoussin.github.io/belem-defi-risk-dependency/). GitHub Pages runs the same portfolio, graph, and incident journey using the **saved historical Morpho API snapshot** captured on 10 October 2026. It does not fetch live data or monitor current incidents; the source label and timestamp remain visible. The hosted bundle is in `docs/`. After changing code or the verified snapshot, run `pnpm pages:build`, commit, and push `docs/` with the source changes to update the site.
+[Open the hosted judge demo](https://kyokoussin.github.io/Branchlens-Belem-Hackathon/). GitHub Pages runs the same portfolio, graph, and incident journey using the **saved historical Morpho API snapshot** captured on 10 October 2026. It does not fetch live data or monitor current incidents; the source label and timestamp remain visible. The hosted bundle is in `docs/`. After changing code or the verified snapshot, run `pnpm pages:build`, commit, and push `docs/` with the source changes to update the site.
 
 ## Launch on this Mac
 
