@@ -81,4 +81,4 @@ const server = http.createServer(async (req, res) => {
   }
   return serveStatic(url.pathname, res);
 });
-server.listen(port, '127.0.0.1', () => console.log(`Belem analyst prototype: http://127.0.0.1:${port}`));
+server.listen(port, '127.0.0.1', () => console.log(`BranchLens local demo: http://127.0.0.1:${port}`));

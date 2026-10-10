@@ -10,6 +10,8 @@ describe('portfolio scenario from the verified Morpho snapshot', () => {
     const result = await buildPortfolio({ source: 'snapshot', scenario: true, snapshot });
     expect(result.mode).toBe('SAVED_HISTORICAL_SNAPSHOT');
     expect(result.portfolio.trackedPositions).toBe(3);
+    expect(result.portfolio.trackedDependencyRelationships).toBe(result.portfolioGraph.edges.length);
+    expect(result.portfolio.distinctDependencies).toBe(result.portfolioGraph.nodes.filter((node) => node.type !== 'Position').length);
     expect(result.portfolio.totalAssumedCapitalUsd).toBe('1750000.00');
     expect(result.portfolio.activeAlerts).toBe(1);
     expect(result.portfolioIncident.status).toBe('SIMULATED_NOT_OBSERVED');

@@ -60,7 +60,7 @@ export function exitIntentFor(analysis, incident) {
     quoteStatus: 'UNKNOWN', quoteExpiresAt: null,
     analystApprovalState: 'NOT_APPROVED',
     executionEnabled: false, executable: false,
-    validationErrors: ['No real Belem wallet or vault shares supplied.', 'Wallet-specific maxWithdraw is unverified.', 'Token-unit amount and transaction quote are unavailable.'],
+    validationErrors: ['No connected portfolio wallet or vault shares supplied.', 'Wallet-specific maxWithdraw is unverified.', 'Token-unit amount and transaction quote are unavailable.'],
   };
 }
 

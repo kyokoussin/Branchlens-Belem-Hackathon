@@ -112,7 +112,7 @@ export async function buildPortfolio({ source = 'auto', scenario = false, snapsh
   const dependencyIds = new Set(loaded.flatMap((item) => item.analysis.graph.nodes.filter((node) => node.type !== 'Position').map((node) => node.id)));
   return {
     mode: loaded.every((item) => item.dataMode === 'LIVE_API') ? 'LIVE_API' : loaded.every((item) => item.dataMode === 'SAVED_HISTORICAL_SNAPSHOT') ? 'SAVED_HISTORICAL_SNAPSHOT' : 'MIXED_LIVE_AND_SNAPSHOT',
-    portfolio: { totalAssumedCapitalUsd: money(loaded.reduce((sum, item) => sum.plus(item.amountUsd), new Decimal(0))), trackedPositions: loaded.length, distinctDependencies: dependencyIds.size, activeAlerts: portfolioIncident ? 1 : 0 },
+    portfolio: { totalAssumedCapitalUsd: money(loaded.reduce((sum, item) => sum.plus(item.amountUsd), new Decimal(0))), trackedPositions: loaded.length, trackedDependencyRelationships: portfolioGraph.edges.length, distinctDependencies: dependencyIds.size, activeAlerts: portfolioIncident ? 1 : 0 },
     positions: loaded,
     portfolioGraph,
     impactIndex,

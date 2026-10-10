@@ -93,7 +93,7 @@ export function buildGraph(vault) {
   const positionId = `position:assumed:${vaultId}`;
   node(chainId, 'Blockchain', 'Ethereum');
   node(vaultId, 'Vault', vault.name, vault.address);
-  node(positionId, 'Position', 'Assumed Belem position');
+  node(positionId, 'Position', 'Illustrative position');
   edge(positionId, vaultId, 'HOLDS', 'ASSUMED', 'analyst-entered position');
   edge(vaultId, chainId, 'DEPLOYED_ON', 'OBSERVED', 'vault.chain.id');
   const depositId = `token:1:${vault.asset.address}`;
