@@ -1,0 +1,107 @@
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { layoutGraph } from './graphLayout';
+import type { Position } from './model';
+
+const money = (value: string | null | undefined) => value == null ? 'Not verified' : new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(Number(value));
+const short = (value: string) => value.length > 24 ? `${value.slice(0, 10)}…${value.slice(-6)}` : value;
+const mechanisms: Record<string, string> = {
+  Position: 'Its risk comes from the vault and the markets beneath it.', Vault: 'Allocation changes, smart-contract failure, or withdrawal constraints could affect this position.',
+  LendingMarket: 'Collateral impairment, liquidations, bad debt, or liquidity stress could affect lender recoveries.',
+  CollateralToken: 'A price depeg, custody failure, or redemption disruption can weaken borrower collateral.',
+  LoanToken: 'Loan-asset impairment or transfer restrictions can affect withdrawals and recoveries.',
+  Oracle: 'An incorrect or stale market price can affect collateral valuation and liquidation decisions.',
+  OracleFeed: 'An upstream feed outage or bad data may propagate into a market oracle; the feed address is observed, but its current health is not assessed.',
+  OracleVault: 'A vault conversion used by an oracle may introduce an additional valuation dependency.',
+  IssuerCustodian: 'Issuer or custody disruption could affect backing and redemption. This link is a documented company claim.',
+  BackingAsset: 'Backing-asset or custody impairment could affect the collateral token. Reserve holdings are not independently verified here.',
+  Blockchain: 'Chain availability and settlement correctness affect every dependent market.',
+};
+
+export function GraphExplorer({ position, selectedId, onSelect, onReview }: { position: Position; selectedId: string; onSelect: (id: string) => void; onReview: () => void }) {
+  const analysis = position.analysis;
+  const layout = useMemo(() => layoutGraph(analysis), [analysis]);
+  const viewport = useRef<HTMLDivElement>(null);
+  const drag = useRef<{ x: number; y: number; left: number; top: number } | null>(null);
+  const [zoom, setZoom] = useState(0.8);
+  const [offset, setOffset] = useState({ x: 25, y: 20 });
+  const selected = layout.byId.get(selectedId) || layout.nodes.find((node) => node.type === 'Position') || layout.nodes[0];
+  const scenario = position.simulation?.available ? position.simulation : null;
+  const incidentMarkets = new Set(scenario?.marketIds || []);
+  const relatedMarkets = new Set(selected?.affectedMarketIds || []);
+  const selectedEdgeIds = useMemo(() => {
+    const ids = new Set<string>();
+    const expandForward = selected?.type === 'Position' || selected?.type === 'Vault';
+    const queue = [selected?.id];
+    const visited = new Set<string>();
+    while (queue.length) {
+      const current = queue.shift();
+      if (!current || visited.has(current)) continue;
+      visited.add(current);
+      for (const edge of analysis.graph.edges) {
+        if (expandForward ? edge.from === current : edge.to === current) {
+          ids.add(edge.id);
+          queue.push(expandForward ? edge.to : edge.from);
+        }
+      }
+    }
+    return ids;
+  }, [analysis.graph.edges, selected?.id, selected?.type]);
+  const cbBtcNode = layout.nodes.find((node) => node.type === 'CollateralToken' && node.label.toLowerCase() === 'cbbtc');
+  const incidentEdgeIds = new Set((scenario?.dependencyPaths || []).flatMap((path) => path.slice(0, -1).map((from, i) => `${from}|${path[i + 1]}`)));
+
+  useEffect(() => {
+    const node = layout.byId.get(selectedId);
+    const el = viewport.current;
+    if (!node || !el) return;
+    setOffset({ x: Math.min(80, el.clientWidth * 0.42 - node.x * zoom), y: el.clientHeight * 0.43 - node.y * zoom });
+  }, [selectedId, position.id, layout, zoom]);
+
+  function fit() {
+    const el = viewport.current;
+    if (!el) return;
+    const next = Math.max(0.32, Math.min(0.9, el.clientWidth / layout.width, el.clientHeight / layout.height));
+    setZoom(next); setOffset({ x: 16, y: 16 });
+  }
+  const connectedEdges = analysis.graph.edges.filter((edge) => edge.from === selected.id || edge.to === selected.id);
+  const statuses = [...new Set(connectedEdges.map((edge) => edge.status))];
+  const sources = [...new Set(connectedEdges.map((edge) => edge.evidence.source).filter(Boolean))];
+  const relatedFindings = analysis.findings.filter((finding) => finding.subjectId === selected.id || (selected.type === 'LendingMarket' && finding.affectedMarketIds.includes(selected.id.split(':').pop() || '')));
+  const shownMarkets = selected.affectedMarketIds.slice(0, 5);
+
+  return <div className="explorer-grid">
+    <section className="graph-panel card"><div className="panel-heading"><div><div className="eyebrow">INTERACTIVE DEPENDENCY MAP</div><h2>Follow the capital</h2><p>Click any node to inspect its evidence and financial reach. Drag to pan; scroll to zoom.</p></div><div className="graph-tools"><button onClick={() => setZoom((value) => Math.max(0.35, value - 0.15))} aria-label="Zoom out">−</button><span>{Math.round(zoom * 100)}%</span><button onClick={() => setZoom((value) => Math.min(1.5, value + 0.15))} aria-label="Zoom in">+</button><button onClick={fit}>Fit</button></div></div>
+      <div className="graph-shortcuts"><button onClick={() => onSelect(layout.nodes.find((node) => node.type === 'Position')?.id || '')}>Investment</button>{cbBtcNode && <button onClick={() => onSelect(cbBtcNode.id)}>Focus cbBTC</button>}{scenario && <span className="scenario-key">Amber paths: hypothetical incident</span>}</div>
+      <div className="graph-viewport" ref={viewport}
+        onPointerDown={(event) => { if ((event.target as HTMLElement).closest('button')) return; drag.current = { x: event.clientX, y: event.clientY, left: offset.x, top: offset.y }; event.currentTarget.setPointerCapture(event.pointerId); }}
+        onPointerMove={(event) => { if (drag.current) setOffset({ x: drag.current.left + event.clientX - drag.current.x, y: drag.current.top + event.clientY - drag.current.y }); }}
+        onPointerUp={() => { drag.current = null; }} onPointerCancel={() => { drag.current = null; }}
+        onWheel={(event) => { event.preventDefault(); setZoom((value) => Math.max(0.35, Math.min(1.5, value - Math.sign(event.deltaY) * 0.08))); }}>
+        <div className="graph-stage" style={{ width: layout.width, height: layout.height, transform: `translate(${offset.x}px, ${offset.y}px) scale(${zoom})` }}>
+          <svg className="graph-lines" width={layout.width} height={layout.height} aria-hidden="true">{analysis.graph.edges.filter((edge) => !layout.byId.get(edge.to)?.type.includes('Blockchain')).map((edge) => {
+            const from = layout.byId.get(edge.from); const to = layout.byId.get(edge.to);
+            if (!from || !to) return null;
+            const x1 = from.x + from.width; const y1 = from.y + from.height / 2; const x2 = to.x; const y2 = to.y + to.height / 2;
+            const selectedPath = selectedEdgeIds.has(edge.id);
+            const incidentPath = incidentEdgeIds.has(`${edge.from}|${edge.to}`) || (scenario && edge.from === cbBtcNode?.id);
+            return <path key={edge.id} d={`M ${x1} ${y1} C ${x1 + 46} ${y1}, ${x2 - 46} ${y2}, ${x2} ${y2}`} className={`graph-line ${incidentPath ? 'incident' : selectedPath ? 'selected' : ''} ${edge.status === 'DOCUMENTED' ? 'documented' : ''}`} />;
+          })}</svg>
+          {layout.nodes.map((node) => {
+            const isIncident = incidentMarkets.has(node.id.split(':').pop() || '') || (scenario && node.id === cbBtcNode?.id);
+            const isRelated = node.id === selected.id || (node.type === 'LendingMarket' && relatedMarkets.has(node.id.split(':').pop() || ''));
+            return <button key={node.id} className={`map-node ${node.type.toLowerCase()} ${node.id === selected.id ? 'active' : ''} ${isIncident ? 'incident' : ''} ${isRelated ? 'related' : ''}`} style={{ left: node.x, top: node.y, width: node.width, height: node.height }} title={node.address || node.label} onClick={(event) => { event.stopPropagation(); onSelect(node.id); }}><span>{node.type.replace(/([a-z])([A-Z])/g, '$1 $2')}</span><strong>{node.label}</strong></button>;
+          })}
+        </div>
+      </div>
+      <div className="graph-legend"><span><i className="legend-dot observed" />Observed Morpho link</span><span><i className="legend-dot documented" />Documented claim</span><span><i className="legend-dot assumed" />Assumed position</span></div>
+    </section>
+    <aside className="inspector card"><div className="eyebrow">DEPENDENCY INSPECTOR</div><h2>{selected.type === 'Position' ? analysis.vault.name : selected.label}</h2><div className="inspector-sub"><span className="type-pill">{selected.type.replace(/([a-z])([A-Z])/g, '$1 $2')}</span><span>{statuses.length ? statuses.join(' / ') : 'ASSUMED'}</span></div>
+      <div className="inspector-impact"><small>Assumed capital linked to this branch</small><strong>{money(selected.capitalExposedUsd)}</strong><span>{selected.affectedMarketIds.length} funded market{selected.affectedMarketIds.length === 1 ? '' : 's'} · unique within this position</span></div>
+      <p>{selected.type === 'Position' ? position.description : mechanisms[selected.type] || 'This dependency is connected through the observed or documented graph relationships shown at left.'}</p>
+      {selected.type === 'Position' && <div className="inspect-list"><h3>Investment summary</h3><p>Assumed investment: <strong>{money(position.amountUsd)}</strong></p><p>Underlying asset: <strong>{analysis.vault.asset.symbol}</strong></p><p>Funded markets: <strong>{analysis.vault.allocations.length}</strong></p><p>Vault allocation coverage: <strong>{(Number(analysis.exposure.coverageRatio) * 100).toFixed(1)}%</strong></p><p>Discovered nodes: <strong>{analysis.graph.nodes.length}</strong></p><p>Structural observations: <strong>{analysis.findings.filter((item) => item.status === 'TRIGGERED').length}</strong> concentration rule{analysis.findings.filter((item) => item.status === 'TRIGGERED').length === 1 ? '' : 's'} triggered; no live incident implied.</p></div>}
+      {selected.type === 'LendingMarket' && <div className="inspect-list"><h3>Market state from Morpho</h3>{(() => { const row = analysis.vault.allocations.find((item) => item.marketId === selected.id.split(':').pop()); return row && <><p>Collateral / loan: <strong>{row.collateral.symbol} / {row.loan.symbol}</strong></p><p>Allocation: <strong>{money(row.allocationUsd)}</strong></p><p>Market liquidity: <strong>{money(row.marketLiquidityUsd)}</strong></p><p>Utilization: <strong>{row.utilization == null ? 'Unknown' : `${(Number(row.utilization) * 100).toFixed(1)}%`}</strong></p><p>Liquidation LTV: <strong>{row.lltv == null ? 'Unknown' : `${(Number(row.lltv) * 100).toFixed(1)}%`}</strong></p></>; })()}</div>}
+      <div className="inspect-list"><h3>Connected branch</h3><p>{connectedEdges.length} direct relationship{connectedEdges.length === 1 ? '' : 's'}; {selected.affectedMarketIds.length} affected funded markets.</p>{shownMarkets.map((id) => <code key={id}>{short(id)}</code>)}{selected.affectedMarketIds.length > shownMarkets.length && <small>+{selected.affectedMarketIds.length - shownMarkets.length} more markets</small>}</div>
+      <div className="inspect-list"><h3>Signals and limitations</h3>{scenario && selected.id === cbBtcNode?.id && <p className="signal-warning">Hypothetical −30% price deviation triggered the scenario rule. This is not a live price observation. <button onClick={onReview}>Review Incident →</button></p>}{relatedFindings.slice(0, 3).map((finding) => <p key={finding.id}><strong>{finding.signalType === 'STRUCTURAL_WARNING' ? 'STRUCTURAL CONCENTRATION' : finding.status}</strong> · {finding.title}</p>)}{relatedFindings.length === 0 && !scenario && <p>No live failure signal has been verified for this node.</p>}<p>{mechanisms[selected.type] || 'Specific failure impact requires further analysis.'}</p></div>
+      <div className="inspect-list"><h3>Evidence</h3>{selected.address && <p>{selected.type === 'LendingMarket' ? 'Market ID' : 'Address'} {/^0x[0-9a-fA-F]{40}$/.test(selected.address) ? <a href={`https://etherscan.io/address/${selected.address}`} target="_blank" rel="noopener noreferrer"><code>{short(selected.address)}</code></a> : <code title={selected.address}>{short(selected.address)}</code>}</p>}{sources.map((source) => <p key={source}><a href={source} target="_blank" rel="noopener noreferrer">{source.includes('coinbase') ? 'Coinbase documentation' : 'Morpho API source'} ↗</a></p>)}<small>{position.dataMode === 'LIVE_API' ? 'Live API retrieved' : 'Historical snapshot retrieved'} {new Date(analysis.vault.provenance.retrievedAt).toLocaleString()}. {analysis.vault.provenance.sourceTimestamp ? 'Source time available.' : 'GraphQL index time not provided.'}</small></div>
+    </aside>
+  </div>;
+}
