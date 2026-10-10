@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { GraphExplorer } from './GraphExplorer';
 import type { PortfolioData, Position } from './model';
 
@@ -15,6 +15,7 @@ function SourceBadge({ position }: { position: Position }) {
 }
 
 export default function App() {
+  const staticHost = window.location.hostname.endsWith('.github.io');
   const [screen, setScreen] = useState<Screen>('home');
   const [selectedPositionId, setSelectedPositionId] = useState('steakhouse-usdc');
   const [selectedNodeId, setSelectedNodeId] = useState('');
@@ -25,17 +26,29 @@ export default function App() {
   const [busy, setBusy] = useState(true);
   const [error, setError] = useState('');
   const [copied, setCopied] = useState(false);
+  const replayStartedAt = useRef<string | null>(null);
   useEffect(() => {
     let active = true;
     const controller = new AbortController();
     async function load() {
       setBusy(true); setError('');
       try {
-        const params = new URLSearchParams({ source });
-        if (scenario) params.set('scenario', 'CBBTC_DEPEG_30');
-        const response = await fetch(`/api/portfolio?${params}`, { cache: 'no-store', signal: controller.signal });
-        const payload = await response.json();
-        if (!response.ok) throw new Error(payload.error || 'Portfolio data unavailable.');
+        let payload: PortfolioData;
+        try {
+          if (staticHost) throw new Error('Static demo host');
+          const params = new URLSearchParams({ source });
+          if (scenario) params.set('scenario', 'CBBTC_DEPEG_30');
+          const response = await fetch(`/api/portfolio?${params}`, { cache: 'no-store', signal: controller.signal });
+          if (!response.ok) throw new Error(`Portfolio API returned ${response.status}`);
+          payload = await response.json();
+        } catch (apiError) {
+          if (controller.signal.aborted) throw apiError;
+          const file = scenario ? 'demo-scenario.json' : 'demo-baseline.json';
+          const response = await fetch(`${import.meta.env.BASE_URL}${file}`, { cache: 'no-store', signal: controller.signal });
+          if (!response.ok) throw new Error('Neither the portfolio API nor the verified historical demo snapshot is available.');
+          payload = await response.json();
+          if (scenario && payload.portfolioIncident) payload.portfolioIncident.simulatedAt = replayStartedAt.current || new Date().toISOString();
+        }
         if (active) setData(payload);
       } catch (cause) {
         if (active) { setData(null); setError(cause instanceof Error ? cause.message : 'Portfolio data unavailable.'); }
@@ -44,7 +57,7 @@ export default function App() {
     void load();
     const timer = source === 'auto' ? window.setInterval(() => void load(), 60_000) : null;
     return () => { active = false; controller.abort(); if (timer) window.clearInterval(timer); };
-  }, [source, scenario, revision]);
+  }, [source, scenario, revision, staticHost]);
   const selectedPosition = useMemo(() => data?.positions.find((position) => position.id === selectedPositionId) || data?.positions[0] || null, [data, selectedPositionId]);
   useEffect(() => {
     if (!selectedPosition) return;
@@ -59,8 +72,8 @@ export default function App() {
     setSelectedNodeId(position.analysis.graph.nodes.find((node) => node.type === 'Position')?.id || '');
     setScreen('explore'); window.scrollTo({ top: 0, behavior: 'smooth' });
   }
-  function startScenario() { setScenario(true); setCopied(false); }
-  function resetScenario() { setData(null); setScenario(false); setCopied(false); if (screen === 'incident') setScreen('home'); }
+  function startScenario() { replayStartedAt.current = new Date().toISOString(); setScenario(true); setCopied(false); }
+  function resetScenario() { replayStartedAt.current = null; setData(null); setScenario(false); setCopied(false); if (screen === 'incident') setScreen('home'); }
   async function copyIncident() {
     if (!data?.portfolioIncident) return;
     try { await navigator.clipboard.writeText(JSON.stringify(data.portfolioIncident, null, 2)); setCopied(true); }
@@ -70,16 +83,16 @@ export default function App() {
   const primaryPosition = data?.positions.find((position) => position.id === 'steakhouse-usdc');
 
   return <div className="app-shell">
-    <aside className="sidebar"><img className="brand-logo" src="/belem-logo.svg" alt="Belem Capital" /><div className="rail-divider" /><div className="rail-caption">Risk dependency intelligence</div><nav aria-label="Main navigation"><button className={screen === 'home' ? 'active' : ''} onClick={() => setScreen('home')}>Portfolio</button><button className={screen === 'explore' ? 'active' : ''} onClick={() => { if (selectedPosition) openPosition(selectedPosition); }}>Dependency explorer</button><button className={screen === 'incident' ? 'active' : ''} onClick={() => { if (incident) setScreen('incident'); }} disabled={!incident}>Incident review {incident ? '· 1' : ''}</button></nav><div className="rail-foot">Belem Capital hackathon prototype<br />Assumed positions · No trading execution</div></aside>
+    <aside className="sidebar"><img className="brand-logo" src={`${import.meta.env.BASE_URL}belem-logo.svg`} alt="Belem Capital" /><div className="rail-divider" /><div className="rail-caption">Risk dependency intelligence</div><nav aria-label="Main navigation"><button className={screen === 'home' ? 'active' : ''} onClick={() => setScreen('home')}>Portfolio</button><button className={screen === 'explore' ? 'active' : ''} onClick={() => { if (selectedPosition) openPosition(selectedPosition); }}>Dependency explorer</button><button className={screen === 'incident' ? 'active' : ''} onClick={() => { if (incident) setScreen('incident'); }} disabled={!incident}>Incident review {incident ? '· 1' : ''}</button></nav><div className="rail-foot">Belem Capital hackathon prototype<br />Assumed positions · No trading execution</div></aside>
     <main className="workspace"><header className="topbar"><div><div className="eyebrow">BELEM CAPITAL · DEFI RISK DEPENDENCY CHALLENGE</div><h1>{screen === 'home' ? 'Portfolio Risk Intelligence' : screen === 'explore' ? 'Dependency Explorer' : 'Emergency Incident Review'}</h1><p>{screen === 'home' ? 'Understand what sits beneath each investment before a dependency fails.' : screen === 'explore' ? 'Trace real Morpho allocations into markets, collateral, oracles and documented upstream links.' : 'A structured analyst report from a controlled scenario, ready for review.'}</p></div><div className="topbadges"><span className="badge assumed">SIMULATED PORTFOLIO</span><span className={`badge ${data?.mode === 'LIVE_API' ? 'live' : 'snapshot'}`}>{busy ? 'REFRESHING DATA' : data?.mode === 'LIVE_API' ? 'LIVE MORPHO API' : data?.mode === 'SAVED_HISTORICAL_SNAPSHOT' ? 'HISTORICAL SNAPSHOT' : data?.mode === 'MIXED_LIVE_AND_SNAPSHOT' ? 'MIXED DATA SOURCES' : 'DATA UNAVAILABLE'}</span></div></header>
       {error && <div className="error-card"><strong>Data could not be loaded.</strong><p>{error}</p><button onClick={() => setRevision((value) => value + 1)}>Retry</button></div>}
       {!data && !error && <div className="loading-card">Loading verified Morpho investments and dependencies…</div>}
       {data && <>
         {screen === 'home' && <>
           <section className="home-hero card"><div><div className="eyebrow">ONE PORTFOLIO · MANY HIDDEN DEPENDENCIES</div><h2>See the risk below the asset name.</h2><p>Three hypothetical Belem investments point to real Ethereum Morpho vaults. Follow any position to the markets, collateral, oracles and deeper dependencies that could change an exit decision.</p><div className="hero-actions"><button className="primary" onClick={() => document.getElementById('portfolio-cards')?.scrollIntoView({ behavior: 'smooth' })}>Explore Portfolio ↓</button>{!scenario && <button onClick={startScenario}>Simulate Incident</button>}</div></div><div className="hero-monogram" aria-hidden="true">B<span>／</span>C</div></section>
-          <section className="metric-grid" aria-label="Portfolio summary"><div className="metric-card"><small>Total hypothetical capital tracked</small><strong>{money(data.portfolio.totalAssumedCapitalUsd)}</strong></div><div className="metric-card"><small>Tracked positions</small><strong>{data.portfolio.trackedPositions}</strong></div><div className="metric-card"><small>Distinct dependencies discovered</small><strong>{data.portfolio.distinctDependencies}</strong></div><div className="metric-card"><small>Active incident alerts</small><strong>{data.portfolio.activeAlerts}</strong><span>{incident ? '1 simulated alert · no live depeg claim' : 'No live emergency detected'}</span></div></section>
+          <section className="metric-grid" aria-label="Portfolio summary"><div className="metric-card"><small>Total hypothetical capital tracked</small><strong>{money(data.portfolio.totalAssumedCapitalUsd)}</strong></div><div className="metric-card"><small>Tracked positions</small><strong>{data.portfolio.trackedPositions}</strong></div><div className="metric-card"><small>Distinct dependencies discovered</small><strong>{data.portfolio.distinctDependencies}</strong></div><div className="metric-card"><small>Active incident alerts</small><strong>{data.portfolio.activeAlerts}</strong><span>{incident ? '1 simulated alert · no live depeg claim' : data.mode === 'LIVE_API' ? 'No verified live incident signal' : 'No live monitoring in snapshot mode'}</span></div></section>
           {incident ? <section className="home-alert card"><div><div className="eyebrow">SIMULATED INCIDENT · NOT A LIVE DETECTION</div><h2>{incident.title}</h2><p>{incident.affectedPositions.length} investments affected · {money(incident.uniqueCapitalExposedUsd)} unique assumed principal exposed</p></div><button className="primary" onClick={() => setScreen('incident')}>Review Incident →</button></section> : <section className="scenario-invite card"><div><strong>Try the controlled cbBTC incident</strong><p>Inject a hypothetical price deviation into current Morpho allocations to see which positions depend on cbBTC.</p></div><button onClick={startScenario}>Simulate Incident</button></section>}
-          <section className="portfolio-section" id="portfolio-cards"><div className="section-heading"><div><div className="eyebrow">PORTFOLIO · REAL MORPHO REFERENCES</div><h2>Tracked investments</h2><p>Investment amounts are demo assumptions; vault names and allocations come from Morpho.</p></div><div className="data-actions"><button onClick={() => setRevision((value) => value + 1)} disabled={busy}>Refresh data</button><button onClick={() => { setData(null); setSource(source === 'auto' ? 'snapshot' : 'auto'); setScenario(false); }}>{source === 'auto' ? 'Use saved demo snapshot' : 'Return to live API'}</button></div></div><div className="position-grid">{data.positions.map((position, index) => <button className="position-card" key={position.id} onClick={() => openPosition(position)}><span className={`position-icon icon-${index}`}>{position.analysis.vault.asset.symbol.slice(0, 2)}</span><span className="position-main"><span className="position-heading"><strong>{position.analysis.vault.name}</strong><span className="card-arrow">↗</span></span><span className="position-description">{position.description}</span><span className="position-footer"><span><small>Assumed Belem investment</small><b>{money(position.amountUsd)}</b></span><SourceBadge position={position} /></span><span className="position-sub">{position.analysis.vault.allocations.length} funded markets · {position.analysis.graph.nodes.length} dependencies · Ethereum V1</span>{position.changes.length > 0 && <span className="change-note">{position.changes.join(' · ')}</span>}</span></button>)}</div></section>
+          <section className="portfolio-section" id="portfolio-cards"><div className="section-heading"><div><div className="eyebrow">PORTFOLIO · REAL MORPHO REFERENCES</div><h2>Tracked investments</h2><p>Investment amounts are demo assumptions; vault names and allocations come from Morpho.</p></div><div className="data-actions"><button onClick={() => setRevision((value) => value + 1)} disabled={busy}>{staticHost ? 'Reload snapshot' : 'Refresh data'}</button>{!staticHost && <button onClick={() => { replayStartedAt.current = null; setData(null); setSource(source === 'auto' ? 'snapshot' : 'auto'); setScenario(false); }}>{source === 'auto' ? 'Use saved demo snapshot' : 'Return to live API'}</button>}</div></div><div className="position-grid">{data.positions.map((position, index) => <button className="position-card" key={position.id} onClick={() => openPosition(position)}><span className={`position-icon icon-${index}`}>{position.analysis.vault.asset.symbol.slice(0, 2)}</span><span className="position-main"><span className="position-heading"><strong>{position.analysis.vault.name}</strong><span className="card-arrow">↗</span></span><span className="position-description">{position.description}</span><span className="position-footer"><span><small>Assumed Belem investment</small><b>{money(position.amountUsd)}</b></span><SourceBadge position={position} /></span><span className="position-sub">{position.analysis.vault.allocations.length} funded markets · {position.analysis.graph.nodes.length} dependencies · Ethereum V1</span>{position.changes.length > 0 && <span className="change-note">{position.changes.join(' · ')}</span>}</span></button>)}</div></section>
           <p className="provenance-line">Data mode: {data.mode.replaceAll('_', ' ').toLowerCase()}. The backup was captured from Morpho on {new Date(data.snapshotCapturedAt).toLocaleString()}; it is never labeled live. The incident is always a separate hypothetical observation.</p>
         </>}
         {screen === 'explore' && selectedPosition && <><div className="screen-actions"><button onClick={() => setScreen('home')}>← Portfolio</button><SourceBadge position={selectedPosition} /><span>{money(selectedPosition.amountUsd)} assumed capital</span><button onClick={() => setRevision((value) => value + 1)} disabled={busy}>Refresh</button>{scenario ? <button onClick={resetScenario}>Reset Scenario</button> : <button className="primary" onClick={startScenario}>Simulate Incident</button>}</div>

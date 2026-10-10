@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite --host 127.0.0.1",
     "api": "node api/server.mjs",
-    "build": "tsc --noEmit && vite build",
+    "build": "node scripts/buildStaticDemo.mjs && tsc --noEmit && vite build",
+    "pages:build": "pnpm build && node scripts/syncPages.mjs",
     "test": "vitest run",
     "smoke:live": "node api/liveSmoke.mjs",
     "start": "node api/server.mjs"
