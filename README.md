@@ -1,6 +1,10 @@
 # Belem Capital — Portfolio Risk Intelligence
 
-A local, read-only hackathon prototype. It turns three **hypothetical investments** in **real Ethereum Morpho V1 vaults** into a dependency graph and a controlled cbBTC incident investigation. It keeps the original Belem logo at `public/belem-logo.svg` and uses the Belem-inspired design system. It is not an official Belem product, a wallet, or an execution system.
+A read-only hackathon prototype. It turns three **hypothetical investments** in **real Ethereum Morpho V1 vaults** into a dependency graph and a controlled cbBTC incident investigation. It keeps the original Belem logo at `public/belem-logo.svg` and uses the Belem-inspired design system. It is not an official Belem product, a wallet, or an execution system.
+
+## Public demo
+
+[Open the hosted judge demo](https://kyokoussin.github.io/belem-defi-risk-dependency/). GitHub Pages runs the same portfolio, graph, and incident journey using the **saved historical Morpho API snapshot** captured on 10 October 2026. It does not fetch live data or monitor current incidents; the source label and timestamp remain visible. The hosted bundle is in `docs/`. After changing code or the verified snapshot, run `pnpm pages:build`, commit, and push `docs/` with the source changes to update the site.
 
 ## Launch on this Mac
 
