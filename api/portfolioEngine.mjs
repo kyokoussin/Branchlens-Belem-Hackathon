@@ -4,6 +4,8 @@ import { fetchMorphoVault } from './morphoClient.mjs';
 import { analyze, DataError, unionExposure } from './riskEngine.mjs';
 import { formatIncidents } from './incidentFormatter.mjs';
 import { addDocumentedCbbtcDependencies, evaluatePriceDeviation, simulateCbbtcDepeg } from './scenarioEngine.mjs';
+import { CBBTC_ETHEREUM } from './scenarioEngine.mjs';
+import { buildImpactIndex } from './portfolioImpact.mjs';
 
 const money = (number) => new Decimal(number).toDecimalPlaces(2).toFixed(2);
 const monitoringBaseline = new Map();
@@ -18,7 +20,8 @@ export function addGraphImpact(analysis) {
   const allMarketIds = vault.allocations.map((row) => row.marketId);
   const nodes = graph.nodes.map((node) => {
     let marketIds;
-    if (node.type === 'Position' || node.type === 'Vault' || node.type === 'Blockchain') marketIds = allMarketIds;
+    const vaultWide = node.type === 'Position' || node.type === 'Vault' || graph.edges.some((edge) => edge.from.startsWith('vault:') && edge.to === node.id && edge.type !== 'ALLOCATES_TO');
+    if (vaultWide) marketIds = allMarketIds;
     else {
       const found = new Set();
       const visited = new Set();
@@ -32,7 +35,7 @@ export function addGraphImpact(analysis) {
       }
       marketIds = [...found];
     }
-    return { ...node, affectedMarketIds: marketIds, capitalExposedUsd: unionExposure(exposure, marketIds) };
+    return { ...node, affectedMarketIds: marketIds, capitalExposedUsd: vaultWide ? exposure.assumedPrincipalUsd : unionExposure(exposure, marketIds) };
   });
   return { ...analysis, graph: { ...graph, nodes } };
 }
@@ -83,6 +86,9 @@ export async function buildPortfolio({ source = 'auto', scenario = false, snapsh
     const simulation = scenario ? simulateCbbtcDepeg(analysis) : null;
     return { id: position.id, address: position.address, description: position.description, amountUsd: money(position.amountUsd), dataMode: mode, snapshotCapturedAt: mode === 'SAVED_HISTORICAL_SNAPSHOT' ? snapshot.capturedAt : null, changes, analysis, simulation, livePriceSignal: evaluatePriceDeviation({ baseline: null, observed: null, provenance: null }) };
   }));
+  const { graph: portfolioGraph, impacts: impactIndex } = buildImpactIndex(loaded);
+  const cbBtcNodeId = `token:1:${CBBTC_ETHEREUM}`;
+  const cbBtcImpact = impactIndex[cbBtcNodeId];
   const simulations = loaded.filter((item) => item.simulation?.available);
   const portfolioIncident = scenario && simulations.length ? {
     kind: 'SIMULATED_PORTFOLIO_INCIDENT', status: 'SIMULATED_NOT_OBSERVED', id: 'sim_portfolio_cbbtc_depeg_30', severity: 'REVIEW_REQUIRED',
@@ -90,10 +96,11 @@ export async function buildPortfolio({ source = 'auto', scenario = false, snapsh
     whatHappened: 'Analyst replay of a 30% relative cbBTC/BTC price decline. No live depeg was detected.',
     whyItMatters: 'cbBTC is collateral in funded Morpho markets beneath the selected portfolio positions; lender bad debt is not modeled.',
     dependency: 'Ethereum cbBTC collateral',
+    dependencyNodeId: cbBtcNodeId,
     detectionRule: simulations[0].simulation.detectionRule,
-    affectedPositions: simulations.map((item) => ({ id: item.id, name: item.analysis.vault.name, assumedPrincipalUsd: item.amountUsd, exposedPrincipalUsd: item.simulation.capitalExposedUsd, markets: item.simulation.marketIds, dataMode: item.dataMode })),
-    uniqueCapitalExposedUsd: money(simulations.reduce((sum, item) => sum.plus(item.simulation.capitalExposedUsd), new Decimal(0))),
-    maximumConditionalPrincipalLossUsd: money(simulations.reduce((sum, item) => sum.plus(item.simulation.maxPrincipalAtRiskUsd), new Decimal(0))),
+    affectedPositions: cbBtcImpact.affectedPositions.map((item) => ({ id: item.id, name: item.name, assumedPrincipalUsd: item.assumedPrincipalUsd, exposedPrincipalUsd: item.exposedPrincipalUsd, markets: item.marketIds, dataMode: item.dataMode })),
+    uniqueCapitalExposedUsd: cbBtcImpact.uniqueCapitalExposedUsd,
+    maximumConditionalPrincipalLossUsd: cbBtcImpact.maximumConditionalPrincipalLossUsd,
     maxRiskMeaning: 'Conditional bound if all affected principal is lost; it is not a loss estimate from the 30% price deviation.',
     actualLossUsd: null,
     exit: { walletSpecificWithdrawal: 'NOT_VERIFIED', vaultWideLiquidityIsNotWalletCapacity: true, executionQuote: 'NOT_QUOTED', swapSlippage: 'NOT_APPLICABLE_FOR_PLAIN_VAULT_REDEMPTION', gasCost: 'NOT_QUOTED', executionEnabled: false },
@@ -107,6 +114,8 @@ export async function buildPortfolio({ source = 'auto', scenario = false, snapsh
     mode: loaded.every((item) => item.dataMode === 'LIVE_API') ? 'LIVE_API' : loaded.every((item) => item.dataMode === 'SAVED_HISTORICAL_SNAPSHOT') ? 'SAVED_HISTORICAL_SNAPSHOT' : 'MIXED_LIVE_AND_SNAPSHOT',
     portfolio: { totalAssumedCapitalUsd: money(loaded.reduce((sum, item) => sum.plus(item.amountUsd), new Decimal(0))), trackedPositions: loaded.length, distinctDependencies: dependencyIds.size, activeAlerts: portfolioIncident ? 1 : 0 },
     positions: loaded,
+    portfolioGraph,
+    impactIndex,
     portfolioIncident,
     snapshotCapturedAt: snapshot.capturedAt,
   };
