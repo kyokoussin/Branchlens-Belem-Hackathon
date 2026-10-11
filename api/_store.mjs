@@ -5,6 +5,26 @@ import { fileURLToPath } from 'node:url';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 let opened;
 
+function createDemoStore() {
+  const runs = new Map();
+  const reports = new Map();
+  const handoffs = new Map();
+  let workspace = null;
+  return {
+    kind: 'BROWSER_DEMO_EPHEMERAL', close: async () => {},
+    getWorkspace: async () => workspace,
+    putWorkspace: async (value) => { workspace = value; },
+    putSnapshot: async () => {},
+    getRun: async (id) => runs.get(id) || null,
+    putRun: async (run) => { runs.set(run.id, run); },
+    getHandoff: async (id) => handoffs.get(id) || null,
+    putHandoff: async (handoff) => { handoffs.set(handoff.idempotencyKey, handoff); },
+    getReport: async (id) => reports.get(id) || null,
+    listReports: async () => [...reports.values()].sort((a, b) => b.createdAt.localeCompare(a.createdAt)).slice(0, 10),
+    putReport: async (report) => { reports.set(report.id, report); },
+  };
+}
+
 export async function openStore() {
   if (opened) return opened;
   opened = createStore().catch((error) => { opened = null; throw error; });
@@ -12,6 +32,9 @@ export async function openStore() {
 }
 
 async function createStore() {
+  // Vercel functions may start in separate processes. The browser sends its
+  // simulated run with each follow-up; this map is only a per-request adapter.
+  if (!process.env.DATABASE_URL && (process.env.VERCEL || process.env.BRANCHLENS_BROWSER_DEMO === '1')) return createDemoStore();
   const migration = await readFile(join(root, 'migrations', '001_mvp.sql'), 'utf8');
   let query;
   let close;
@@ -24,7 +47,6 @@ async function createStore() {
     close = () => pool.end();
     kind = 'POSTGRESQL';
   } else {
-    if (process.env.VERCEL) throw new Error('DATABASE_URL is required for durable storage on Vercel.');
     const { DatabaseSync } = await import('node:sqlite');
     const db = new DatabaseSync(process.env.BRANCHLENS_DB_PATH || join(root, '.branchlens.sqlite'));
     db.exec(migration);

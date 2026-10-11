@@ -1,5 +1,5 @@
 import { ZodError } from 'zod';
-import { approveDecision, createAnalysis, getReport, getRun, getWorkspace, listReports, putWorkspace, sendToSimulatedBot, updateAssumptions, updateIncidentStatus } from './_workflowService.mjs';
+import { approveDecision, createAnalysis, getReport, getRun, getWorkspace, listReports, putWorkspace, reportForBrowserDemo, seedBrowserDemoRun, sendToSimulatedBot, updateAssumptions, updateIncidentStatus } from './_workflowService.mjs';
 import { listMorphoMarkets } from './_morphoClient.mjs';
 
 async function bodyOf(req) {
@@ -35,6 +35,9 @@ export default async function workflowHandler(req, res) {
     const body = await bodyOf(req);
     if (action === 'workspace') return send(res, 200, await putWorkspace(body));
     if (action === 'analyze') return send(res, 200, await createAnalysis(body));
+    const browserDemo = !process.env.DATABASE_URL && (process.env.VERCEL || process.env.BRANCHLENS_BROWSER_DEMO === '1');
+    if (action === 'report' && body.run && browserDemo) return send(res, 200, reportForBrowserDemo(body.run));
+    if (browserDemo) await seedBrowserDemoRun(body.run, body.runId);
     if (action === 'assumptions') return send(res, 200, await updateAssumptions(body.runId, body.assumptions));
     if (action === 'incident-status') return send(res, 200, await updateIncidentStatus(body.runId, body.status));
     if (action === 'approve') return send(res, 200, await approveDecision(body.runId, body));

@@ -69,6 +69,7 @@ function borrowerPosition(snapshot, risk, portfolioId, runId) {
   return {
     id: `borrower:${runId}`, name: `Simulated ${market.name} borrower`, portfolioId, chainId: market.chainId,
     address: market.address, description: 'Analyst-entered borrower token balances in a verified Morpho market.', amountUsd: capital,
+    positionType: 'borrow', borrowDebtUsd: risk.before?.debtValueUsd || '0.00',
     dataMode: snapshot.mode === 'LIVE_MORPHO_API' ? 'LIVE_API' : 'SAVED_HISTORICAL_SNAPSHOT',
     snapshotCapturedAt: snapshot.mode === 'LIVE_MORPHO_API' ? null : snapshot.capturedAt,
     analysis: { vault: market, graph: documented.graph, exposure },
@@ -150,6 +151,16 @@ function reportFor(run) {
     quoteStatus: 'NOT_QUOTED',
     botHandoff: run.botHandoff || { status: 'NOT_SENT' }, limitations: [...(run.risk.limitations || []), run.caveat],
   };
+}
+
+export async function seedBrowserDemoRun(run, runId) {
+  if (!run || typeof run !== 'object' || run.id !== runId || !String(run.id).startsWith('run_')) throw new Error('The browser demo run is invalid.');
+  await (await openStore()).putRun(run);
+}
+
+export function reportForBrowserDemo(run) {
+  if (!run?.analystDecision || !run?.reportId || run.reportId !== `report:${run.analystDecision.id}`) throw new Error('No approved report exists for this demo run.');
+  return reportFor(run);
 }
 
 export async function approveDecision(runId, { action, justification, analyst = 'Demo analyst' }) {

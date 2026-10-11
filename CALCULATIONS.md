@@ -26,7 +26,26 @@ This is the amount *linked* to a dependency, not the amount expected to be lost.
 
 ## What can and cannot be called a financial loss
 
-- A collateral price shock alone gives **no defensible supplier-loss number**. Actual lender loss requires realized bad debt, liquidation proceeds, recoveries, and the vault's accounting version. It remains `null`, displayed as **Not established**, rather than being set to zero or to the collateral price-change percentage.
+### Default demo stress estimate
+
+The default Impact View now **always selects a clearly simulated stress case**, so its two estimate cards have numbers. These are calculated from Morpho market data and fixed, visible analyst assumptions. They are not observed bad debt or a withdrawal quote.
+
+For a collateral dependency such as cbBTC, use a hypothetical 30% collateral price fall. For each distinct affected market, let **E** be the position's attributed principal, **B** the Morpho market borrow USD, **S** its supply USD, **L** its LLTV, and **Q** its available market liquidity USD:
+
+`gross shortfall fraction = max(0, 1 − 0.70 / L)`
+`modeled lender-loss rate = min(1, (B / S) × 0.25 × gross shortfall fraction × 0.50)`
+`modeled financial loss = sum_distinct_markets(E × modeled lender-loss rate)`
+`modeled immediate exit gap = sum_distinct_markets(E × max(0, 1 − min(1, Q / S)))`
+
+The **25%** assumes that share of borrowing sits at the liquidation threshold. The **50%** assumes half of the gross shortfall is recovered. The market liquidity gap assumes each affected allocation is withdrawn simultaneously from its own market, without vault reallocation. It is an immediate-liquidity proxy, not capital known to be frozen. When market totals are unavailable, the app uses Morpho's reported utilization; if that is also unavailable, it uses an explicit 80% utilization assumption. Missing LLTV uses an explicit 86% assumption. A vault-wide unallocated remainder uses 2% impairment and its reported vault liquidity ratio, or an explicit 50% liquid ratio if unavailable. Each position's loss and exit gap are capped at its uniquely affected principal.
+
+**Simulated borrowers use a different model.** Their tracked amount is collateral, not supplier principal. Under the same 30% collateral shock, `borrower collateral value decline = affected collateral × 0.30`. This is a mark-to-market decline, not realized lender bad debt. The corresponding immediate-exit constraint is `min(affected collateral, assumed debt / (LLTV × 0.70))`: collateral needed to support that debt after the shock and therefore dependent on repayment before withdrawal. Missing LLTV uses the stated 86% assumption. The portfolio estimate can combine supplier modeled loss and borrower mark-to-market decline, but the individual rows label them separately. For other default dependency stresses, the analogous collateral shock is 2%; these are analyst assumptions, not Morpho observations.
+
+For a blockchain dependency, the default scenario is a **simulated 24-hour complete settlement halt**: temporarily inaccessible capital equals unique affected principal, while the modeled economic cost is `affected principal × assumed 5% annual carry / 365`. This is an opportunity cost, not principal impairment. For other dependency types, the default financial stress is an explicitly assumed 2% impairment of attributed principal; the exit gap still uses Morpho market liquidity. Changing the advanced scenario can intentionally remove these assumptions and return an unquantified result.
+
+**Saved-snapshot check:** The cbBTC dependency reaches $773,729.78 of unique simulated principal across five supplied positions. The formula produces $16,219.18 modeled financial loss and a $697,424.89 market-only immediate exit gap. Ethereum's 24-hour outage case reaches $2,650,000, with $363.02 modeled opportunity cost and $2,650,000 temporarily inaccessible. Fresh Morpho data changes these figures.
+
+- A collateral price shock alone gives **no observed supplier-loss number**. The default stress estimate above supplies an explicit scenario with borrower and recovery assumptions. Actual lender loss still requires realized bad debt, liquidation proceeds, recoveries, and the vault's accounting version.
 - In the separate hypothetical **realized market bad-debt** model, the analyst enters a lender-loss rate **r** for one verified market. For a direct-market supplier or a vault verified as V1.0, `conditional position loss = round_cents(min(affected principal, Eₘ × r / 100))`. The portfolio total is the sum of quantifiable position losses. It stays unavailable if any affected vault is V1.1 or its accounting version is unverified. V1.1 does not immediately realize the same depositor share-price loss as V1.0.
 - A simulated **complete chain outage** gives `temporarily inaccessible capital = unique affected capital` *while the halt lasts*. It is not permanent financial loss. For a collateral shock, oracle fault, or liquidity concern, the blocked amount stays `null`, displayed as **Not measured**, until chain status or wallet-specific withdrawal evidence is available. Market-wide liquidity is not a wallet withdrawal quote.
 

@@ -6,6 +6,7 @@ import { formatIncidents } from './_incidentFormatter.mjs';
 import { addDocumentedCbbtcDependencies, evaluatePriceDeviation, simulateCbbtcDepeg } from './_scenarioEngine.mjs';
 import { CBBTC_ETHEREUM } from './_scenarioEngine.mjs';
 import { buildImpactIndex } from './_portfolioImpact.mjs';
+import { evaluateImpactScenario } from './_impactModel.mjs';
 
 const money = (number) => new Decimal(number).toDecimalPlaces(2).toFixed(2);
 const monitoringBaseline = new Map();
@@ -100,11 +101,12 @@ export function aggregateLoadedPortfolio(loaded, scenario = false, snapshotCaptu
   const cbBtcNodeId = `token:1:${CBBTC_ETHEREUM}`;
   const cbBtcImpact = impactIndex[cbBtcNodeId];
   const simulations = loaded.filter((item) => item.simulation?.available);
+  const incidentEstimate = cbBtcImpact ? evaluateImpactScenario(cbBtcImpact, loaded, { type: 'DEMO_STRESS' }) : null;
   const portfolioIncident = scenario && simulations.length ? {
     kind: 'SIMULATED_PORTFOLIO_INCIDENT', status: 'SIMULATED_NOT_OBSERVED', id: 'sim_portfolio_cbbtc_depeg_30', severity: 'REVIEW_REQUIRED',
     title: 'Hypothetical cbBTC 30% depeg relative to BTC',
     whatHappened: 'Analyst replay of a 30% relative cbBTC/BTC price decline. No live depeg was detected.',
-    whyItMatters: 'cbBTC is collateral in funded Morpho markets beneath the selected portfolio positions; lender bad debt is not modeled.',
+    whyItMatters: 'cbBTC backs funded Morpho markets beneath these positions. The loss and immediate exit gap below are calculated stress estimates, not observed losses or withdrawal quotes.',
     dependency: 'Ethereum cbBTC collateral',
     dependencyNodeId: cbBtcNodeId,
     detectionRule: simulations[0].simulation.detectionRule,
@@ -112,9 +114,9 @@ export function aggregateLoadedPortfolio(loaded, scenario = false, snapshotCaptu
     uniqueCapitalExposedUsd: cbBtcImpact.uniqueCapitalExposedUsd,
     conditionalMaxPrincipalLossUsd: cbBtcImpact.uniqueCapitalExposedUsd,
     conditionalMaxAssumption: 'Hypothetical 100% permanent loss of every uniquely attributed dollar; not an estimate from the 30% cbBTC price shock.',
-    estimatedFinancialLossUsd: null,
-    temporarilyInaccessibleCapitalUsd: null,
-    estimationNote: 'A 30% collateral price move does not establish realized lender bad debt or withdrawal blockage. Borrower health, liquidations, recoveries, and wallet-specific liquidity are needed.',
+    estimatedFinancialLossUsd: incidentEstimate?.estimatedFinancialLossUsd ?? null,
+    temporarilyInaccessibleCapitalUsd: incidentEstimate?.temporarilyInaccessibleCapitalUsd ?? null,
+    estimationNote: incidentEstimate?.note || 'Stress estimate unavailable.',
     actualLossUsd: null,
     exit: { walletSpecificWithdrawal: 'NOT_VERIFIED', vaultWideLiquidityIsNotWalletCapacity: true, executionQuote: 'NOT_QUOTED', swapSlippage: 'NOT_APPLICABLE_FOR_PLAIN_VAULT_REDEMPTION', gasCost: 'NOT_QUOTED', executionEnabled: false },
     analystMustVerify: ['Whether cbBTC actually deviated from BTC', 'Borrower health and recoverable bad debt', 'Wallet-specific redeemability and gates', 'Current execution quote and gas cost'],

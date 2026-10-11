@@ -10,7 +10,9 @@ function whyAffected(selected, position, marketCount) {
     ? 'The simulated borrower uses this verified market; tracked collateral and debt are not lender principal or a lender-loss estimate.'
     : `${subject} supplies this verified market. Only its allocated share of the assumed position is counted.`;
   if (selected.type === 'Oracle' || selected.type === 'OracleFeed' || selected.type === 'OracleVault') return `${marketCount} funded market${marketCount === 1 ? '' : 's'} depend on this pricing component. A bad price alone does not establish lender loss.`;
-  if (selected.type === 'CollateralToken') return `${marketCount} funded market${marketCount === 1 ? '' : 's'} accept ${selected.label} as collateral. Collateral stress does not itself establish bad debt.`;
+  if (selected.type === 'CollateralToken') return position.positionType === 'borrow'
+    ? `The simulated borrower pledged ${selected.label} in this verified market. A price shock reduces collateral value; it does not itself establish lender bad debt.`
+    : `${marketCount} funded market${marketCount === 1 ? '' : 's'} accept ${selected.label} as collateral. Collateral stress does not itself establish bad debt.`;
   if (selected.type === 'Vault') return 'The simulated position holds this vault; its underlying allocations determine market-specific exposure.';
   if (selected.type === 'Position') return 'This is the analyst-entered simulated holding, not an observed wallet balance.';
   if (selected.type === 'IssuerCustodian' || selected.type === 'BackingAsset') return `The path continues through a documented backing or custody claim for collateral in ${marketCount} funded market${marketCount === 1 ? '' : 's'}; economic loss is not verified.`;

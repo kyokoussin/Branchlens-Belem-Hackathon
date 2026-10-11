@@ -400,3 +400,26 @@ body { overflow-x: hidden; }
 .crisis-workflow details { margin-top: 16px; }
 .crisis-workflow details p { overflow-wrap: anywhere; }
 .report-json { max-height: 420px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 12px; }
+.nav-more { margin-top: 11px; padding-top: 10px; border-top: 1px solid #35404f; }
+.nav-more summary { padding: 10px 12px; color: #acbecb; font-size: 12px; font-weight: 700; cursor: pointer; }
+.nav-more button { margin-top: 4px; }
+.home-workspace .home-hero { min-height: 410px; padding: 65px clamp(30px, 6vw, 90px); }
+.home-hero h1 { font-size: clamp(64px, 7vw, 112px); }
+.home-hero .hero-tagline { margin-top: 10px; }
+.home-hero .hero-actions { margin-top: 28px; }
+.home-hero .hero-actions button { background: #fff; border-color: #fff; color: #101b2b; }
+.home-hero .hero-actions button.primary { background: #0cc8bc; border-color: #0cc8bc; }
+.home-workspace .metric-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); margin-bottom: 22px; }
+.home-workspace .metric-card { min-height: 105px; }
+.crisis-workflow { padding-top: 12px; }
+.crisis-workflow > .card { margin-top: 14px; }
+.crisis-workflow .advanced-inputs { border-top: 1px solid #e1e8ed; padding-top: 11px; }
+.crisis-workflow .advanced-inputs summary { color: #416b72; font-size: 12px; font-weight: 700; cursor: pointer; }
+@media (max-width: 760px) {
+  .home-workspace .home-hero { min-height: 370px; padding: 55px 25px; }
+  .home-workspace .metric-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .home-workspace .metric-card { min-height: 100px; }
+}
+@media (max-width: 520px) {
+  .home-workspace .metric-grid { grid-template-columns: 1fr 1fr; }
+}
