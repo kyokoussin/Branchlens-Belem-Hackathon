@@ -1,8 +1,8 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
-import { DEMO_POSITIONS } from '../api/portfolioConfig.mjs';
-import { fetchMorphoVault } from '../api/morphoClient.mjs';
-import { analyze } from '../api/riskEngine.mjs';
+import { DEMO_POSITIONS } from '../api/_portfolioConfig.mjs';
+import { fetchMorphoVault } from '../api/_morphoClient.mjs';
+import { analyze } from '../api/_riskEngine.mjs';
 
 const positions = [];
 for (const position of DEMO_POSITIONS) {

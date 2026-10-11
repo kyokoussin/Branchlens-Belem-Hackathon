@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import { describe, expect, it } from 'vitest';
-import { analyzeMarket } from '../api/riskEngine.mjs';
-import { buildPortfolio } from '../api/portfolioEngine.mjs';
+import { analyzeMarket } from '../api/_riskEngine.mjs';
+import { buildPortfolio } from '../api/_portfolioEngine.mjs';
 
 const baseline = JSON.parse(await readFile(new URL('../data/demo-snapshot.json', import.meta.url), 'utf8'));
 const vaultEntry = baseline.positions.find((position) => position.id === 'steakhouse-usdc');

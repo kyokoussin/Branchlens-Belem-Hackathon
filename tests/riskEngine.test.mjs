@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { analyze, calculateExposure, normalizeVault } from '../api/riskEngine.mjs';
-import { formatIncidents } from '../api/incidentFormatter.mjs';
+import { analyze, calculateExposure, normalizeVault } from '../api/_riskEngine.mjs';
+import { formatIncidents } from '../api/_incidentFormatter.mjs';
 
 const A = `0x${'a'.repeat(40)}`;
 const B = `0x${'b'.repeat(40)}`;

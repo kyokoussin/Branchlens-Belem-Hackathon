@@ -5,17 +5,20 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1",
-    "api": "node api/server.mjs",
+    "api": "node api/_server.mjs",
     "build": "node scripts/buildStaticDemo.mjs && tsc --noEmit && vite build",
     "pages:build": "pnpm build && node scripts/syncPages.mjs",
     "test": "vitest run",
-    "smoke:live": "node api/liveSmoke.mjs",
-    "start": "node api/server.mjs"
+    "smoke:live": "node api/_liveSmoke.mjs",
+    "capture:borrower": "node scripts/captureBorrowerSnapshot.mjs",
+    "start": "node api/_server.mjs"
   },
   "dependencies": {
     "decimal.js": "^10.6.0",
+    "pg": "^8.23.1",
     "react": "^19.3.0",
-    "react-dom": "^19.3.0"
+    "react-dom": "^19.3.0",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@types/react": "^19.3.0",

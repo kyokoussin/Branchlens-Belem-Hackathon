@@ -1,6 +1,6 @@
-import { DEMO_POSITIONS } from '../api/portfolioConfig.mjs';
-import { fetchMorphoMarket, fetchMorphoVault } from '../api/morphoClient.mjs';
-import { aggregateLoadedPortfolio, buildPortfolio } from '../api/portfolioEngine.mjs';
+import { DEMO_POSITIONS } from '../api/_portfolioConfig.mjs';
+import { fetchMorphoMarket, fetchMorphoVault } from '../api/_morphoClient.mjs';
+import { aggregateLoadedPortfolio, buildPortfolio } from '../api/_portfolioEngine.mjs';
 import type { PortfolioData } from './model';
 
 export type ManagedPortfolio = { id: string; name: string };

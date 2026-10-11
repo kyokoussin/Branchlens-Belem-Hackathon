@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { DEFAULT_VAULT, fetchMorphoVault } from '../api/morphoClient.mjs';
+import { DEFAULT_VAULT, fetchMorphoVault } from '../api/_morphoClient.mjs';
 
 afterEach(() => vi.unstubAllGlobals());
 

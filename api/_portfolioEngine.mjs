@@ -1,11 +1,11 @@
 import Decimal from 'decimal.js';
-import { DEMO_POSITIONS } from './portfolioConfig.mjs';
-import { fetchMorphoMarket, fetchMorphoVault } from './morphoClient.mjs';
-import { analyze, analyzeMarket, DataError, unionExposure } from './riskEngine.mjs';
-import { formatIncidents } from './incidentFormatter.mjs';
-import { addDocumentedCbbtcDependencies, evaluatePriceDeviation, simulateCbbtcDepeg } from './scenarioEngine.mjs';
-import { CBBTC_ETHEREUM } from './scenarioEngine.mjs';
-import { buildImpactIndex } from './portfolioImpact.mjs';
+import { DEMO_POSITIONS } from './_portfolioConfig.mjs';
+import { fetchMorphoMarket, fetchMorphoVault } from './_morphoClient.mjs';
+import { analyze, analyzeMarket, DataError, unionExposure } from './_riskEngine.mjs';
+import { formatIncidents } from './_incidentFormatter.mjs';
+import { addDocumentedCbbtcDependencies, evaluatePriceDeviation, simulateCbbtcDepeg } from './_scenarioEngine.mjs';
+import { CBBTC_ETHEREUM } from './_scenarioEngine.mjs';
+import { buildImpactIndex } from './_portfolioImpact.mjs';
 
 const money = (number) => new Decimal(number).toDecimalPlaces(2).toFixed(2);
 const monitoringBaseline = new Map();

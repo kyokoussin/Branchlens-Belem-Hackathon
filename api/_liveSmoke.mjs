@@ -1,6 +1,6 @@
-import { DEFAULT_VAULT, fetchMorphoVault } from './morphoClient.mjs';
-import { analyze } from './riskEngine.mjs';
-import { formatIncidents } from './incidentFormatter.mjs';
+import { DEFAULT_VAULT, fetchMorphoVault } from './_morphoClient.mjs';
+import { analyze } from './_riskEngine.mjs';
+import { formatIncidents } from './_incidentFormatter.mjs';
 
 const { raw, provenance } = await fetchMorphoVault(process.argv[2] || DEFAULT_VAULT);
 const result = formatIncidents(analyze(raw, provenance, '1000000'));

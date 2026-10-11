@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import { describe, expect, it } from 'vitest';
-import { buildPortfolio } from '../api/portfolioEngine.mjs';
-import { CBBTC_ETHEREUM } from '../api/scenarioEngine.mjs';
+import { buildPortfolio } from '../api/_portfolioEngine.mjs';
+import { CBBTC_ETHEREUM } from '../api/_scenarioEngine.mjs';
 
 const snapshot = JSON.parse(await readFile(new URL('../data/demo-snapshot.json', import.meta.url), 'utf8'));
 

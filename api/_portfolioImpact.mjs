@@ -1,5 +1,5 @@
 import Decimal from 'decimal.js';
-import { unionExposure } from './riskEngine.mjs';
+import { unionExposure } from './_riskEngine.mjs';
 
 const money = (value) => new Decimal(value).toDecimalPlaces(2).toFixed(2);
 

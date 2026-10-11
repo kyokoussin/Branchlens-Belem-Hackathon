@@ -1,6 +1,6 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
-import { buildPortfolio } from '../api/portfolioEngine.mjs';
+import { buildPortfolio } from '../api/_portfolioEngine.mjs';
 
 const snapshot = JSON.parse(await readFile(new URL('../data/demo-snapshot.json', import.meta.url), 'utf8'));
 await writeFile(fileURLToPath(new URL('../public/demo-snapshot.json', import.meta.url)), JSON.stringify(snapshot));

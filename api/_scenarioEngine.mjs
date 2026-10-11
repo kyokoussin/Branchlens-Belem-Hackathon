@@ -1,6 +1,6 @@
 import Decimal from 'decimal.js';
-import { unionExposure } from './riskEngine.mjs';
-import { stableId } from './stableId.mjs';
+import { unionExposure } from './_riskEngine.mjs';
+import { stableId } from './_stableId.mjs';
 
 // Coinbase's published Ethereum cbBTC contract, not a market or exposure fixture.
 export const CBBTC_ETHEREUM = '0xcbb7c0000ab88b473b1f5afd9ef808440eed33bf';

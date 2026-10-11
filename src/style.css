@@ -375,3 +375,11 @@ body { overflow-x: hidden; }
 .managed-row > div:last-child { display: flex; gap: 6px; }
 @media (max-width: 1050px) { .filter-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (max-width: 760px) { .filter-grid, .position-form { grid-template-columns: 1fr; } .portfolio-management-list > div { flex-wrap: wrap; } .managed-row { flex-direction: column; } .search-panel { padding: 16px; } .global-graph-summary { margin-top: 14px; } }
+.crisis-workflow { max-width: 1500px; margin: 0 auto; padding: 30px 0 80px; }
+.crisis-workflow > h1 { margin: 5px 0 8px; }
+.crisis-workflow > p { color: var(--muted, #607383); max-width: 850px; }
+.crisis-workflow > .card { margin-top: 22px; }
+.crisis-workflow .incident-metrics { margin: 18px 0; }
+.crisis-workflow details { margin-top: 16px; }
+.crisis-workflow details p { overflow-wrap: anywhere; }
+.report-json { max-height: 420px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 12px; }

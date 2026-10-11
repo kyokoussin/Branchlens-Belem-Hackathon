@@ -155,3 +155,51 @@ export async function fetchMorphoMarket(marketId, chainId = 1) {
     note: 'GraphQL market state is reported by Morpho. Retrieval time is not blockchain index time.',
   } };
 }
+
+async function publicRest(path) {
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 12000);
+    try {
+      const response = await fetch(`https://api.morpho.org${path}`, { headers: { accept: 'application/json' }, signal: controller.signal });
+      if (!response.ok) {
+        if (response.status === 429 || response.status >= 500) {
+          if (attempt < 2) { await new Promise((resolve) => setTimeout(resolve, Math.min(1500, 300 * (2 ** attempt)))); continue; }
+        }
+        throw new SourceError(`Morpho REST API returned HTTP ${response.status}.`, response.status === 429 ? 'RATE_LIMITED' : 'SOURCE_UNAVAILABLE');
+      }
+      return await response.json();
+    } catch (error) {
+      if (error instanceof SourceError || attempt === 2) throw error instanceof SourceError ? error : new SourceError(error.name === 'AbortError' ? 'Morpho REST API timed out.' : 'Morpho REST API could not be reached.');
+      await new Promise((resolve) => setTimeout(resolve, 300 * (2 ** attempt)));
+    } finally { clearTimeout(timeout); }
+  }
+}
+
+export async function fetchMorphoAssetPrice(address, chainId = 1) {
+  if (!ADDRESS.test(address) || ![1, 8453].includes(chainId)) throw new SourceError('Invalid token address or chain.', 'INVALID_ADDRESS');
+  const endpoint = `/v0/tokens/${chainId}:${address}/price`;
+  const body = await publicRest(endpoint);
+  const row = body?.data;
+  const timestamp = Number(row?.timestamp);
+  if (row?.chain_id !== chainId || row?.address?.toLowerCase() !== address.toLowerCase() || !Number.isFinite(row?.price) || row.price <= 0 || !Number.isInteger(timestamp) || timestamp <= 0) throw new SourceError('Morpho token-price identity, value or timestamp is invalid.', 'INVALID_SOURCE_DATA');
+  return { address: address.toLowerCase(), chainId, usd: String(row.price), timestamp: new Date(timestamp * 1000).toISOString(), provider: row.provider || 'UNKNOWN', endpoint: `https://api.morpho.org${endpoint}`, retrievedAt: new Date().toISOString() };
+}
+
+export async function fetchMorphoOracleState(address, chainId = 1) {
+  if (!ADDRESS.test(address) || ![1, 8453].includes(chainId)) throw new SourceError('Invalid oracle address or chain.', 'INVALID_ADDRESS');
+  const endpoint = `/v0/oracles/${chainId}:${address}/state`;
+  const body = await publicRest(endpoint);
+  const row = body?.data;
+  if (row?.chain_id !== chainId || row?.address?.toLowerCase() !== address.toLowerCase()) throw new SourceError('Morpho oracle-state identity is invalid.', 'INVALID_SOURCE_DATA');
+  return { address: address.toLowerCase(), chainId, rawQuote: row.price == null ? null : String(row.price), lastUpdatedAt: row.last_updated_at || null, indexedBlock: row.last_indexed_block || null, endpoint: `https://api.morpho.org${endpoint}`, retrievedAt: new Date().toISOString(), note: 'The raw Morpho oracle quote is not a USD token price and is not used in borrower-dollar calculations.' };
+}
+
+export async function listMorphoMarkets({ chainId = 1, cursor = null, limit = 25 } = {}) {
+  if (![1, 8453].includes(chainId) || !Number.isInteger(limit) || limit < 1 || limit > 100) throw new SourceError('Invalid market-list chain or page size.', 'INVALID_REQUEST');
+  const params = new URLSearchParams({ chain_id: String(chainId), listed: 'true', limit: String(limit) });
+  if (cursor) params.set('cursor', cursor);
+  const body = await publicRest(`/v1/blue/markets?${params}`);
+  if (!Array.isArray(body?.data)) throw new SourceError('Morpho market-list response is malformed.', 'INVALID_SOURCE_DATA');
+  return { items: body.data.filter((item) => MARKET_ID.test(item.market_id || item.marketId || '')).map((item) => ({ marketId: (item.market_id || item.marketId).toLowerCase(), chainId })), cursor: body.cursor || null, endpoint: `https://api.morpho.org/v1/blue/markets?${params}`, retrievedAt: new Date().toISOString() };
+}

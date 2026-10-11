@@ -2,11 +2,12 @@ import http from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { dirname, extname, join, resolve } from 'node:path';
-import { DEFAULT_VAULT, fetchMorphoVault, SourceError } from './morphoClient.mjs';
-import { analyze, DataError } from './riskEngine.mjs';
-import { formatIncidents } from './incidentFormatter.mjs';
-import { addDocumentedCbbtcDependencies, simulateCbbtcDepeg } from './scenarioEngine.mjs';
-import { buildPortfolio } from './portfolioEngine.mjs';
+import { DEFAULT_VAULT, fetchMorphoVault, SourceError } from './_morphoClient.mjs';
+import { analyze, DataError } from './_riskEngine.mjs';
+import { formatIncidents } from './_incidentFormatter.mjs';
+import { addDocumentedCbbtcDependencies, simulateCbbtcDepeg } from './_scenarioEngine.mjs';
+import { buildPortfolio } from './_portfolioEngine.mjs';
+import workflowHandler from './workflow.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const dist = join(root, 'dist');
@@ -32,8 +33,10 @@ async function serveStatic(pathname, res) {
   } catch { json(res, 404, { error: 'Build the UI first with pnpm build.' }); }
 }
 
-const server = http.createServer(async (req, res) => {
+export async function handleRequest(req, res, forcedPath = null) {
   const url = new URL(req.url || '/', `http://127.0.0.1:${port}`);
+  if (forcedPath) url.pathname = forcedPath;
+  if (url.pathname === '/api/workflow') return workflowHandler(req, res);
   if (req.method !== 'GET') return json(res, 405, { error: 'Read-only server: GET only.' });
   if (url.pathname === '/api/health') return json(res, 200, { status: 'running', dataSource: 'Morpho public API queried per analysis request' });
   if (url.pathname === '/api/portfolio') {
@@ -80,5 +83,9 @@ const server = http.createServer(async (req, res) => {
     return json(res, incident ? 200 : 404, incident || { error: 'Incident not in this local session. Run an analysis first.' });
   }
   return serveStatic(url.pathname, res);
-});
-server.listen(port, '127.0.0.1', () => console.log(`BranchLens local demo: http://127.0.0.1:${port}`));
+}
+
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  const server = http.createServer((req, res) => { void handleRequest(req, res); });
+  server.listen(port, '127.0.0.1', () => console.log(`BranchLens local demo: http://127.0.0.1:${port}`));
+}

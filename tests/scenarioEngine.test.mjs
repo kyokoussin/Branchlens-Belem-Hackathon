@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { analyze } from '../api/riskEngine.mjs';
-import { addDocumentedCbbtcDependencies, CBBTC_ETHEREUM, evaluatePriceDeviation, simulateCbbtcDepeg } from '../api/scenarioEngine.mjs';
+import { analyze } from '../api/_riskEngine.mjs';
+import { addDocumentedCbbtcDependencies, CBBTC_ETHEREUM, evaluatePriceDeviation, simulateCbbtcDepeg } from '../api/_scenarioEngine.mjs';
 
 const vaultAddress = `0x${'d'.repeat(40)}`;
 const usdc = `0x${'a'.repeat(40)}`;

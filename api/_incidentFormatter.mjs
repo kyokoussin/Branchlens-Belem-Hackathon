@@ -1,4 +1,4 @@
-import { stableId } from './stableId.mjs';
+import { stableId } from './_stableId.mjs';
 
 function pathsForFinding(analysis, finding) {
   const { vault, graph } = analysis;

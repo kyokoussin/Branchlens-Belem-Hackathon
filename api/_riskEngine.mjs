@@ -105,7 +105,7 @@ export function normalizeMarket(raw, provenance) {
   };
 }
 
-export function buildGraph(vault) {
+export function buildGraph(vault, { positionRole = 'SUPPLIER' } = {}) {
   const nodes = [];
   const edges = [];
   const seenNodes = new Set();
@@ -136,7 +136,7 @@ export function buildGraph(vault) {
   for (const allocation of vault.allocations) {
     const marketId = `market:${vault.chainId}:${allocation.marketId}`;
     node(marketId, 'LendingMarket', `Morpho ${allocation.collateral.symbol}/${allocation.loan.symbol}`, allocation.marketId);
-    if (marketPosition) edge(positionId, marketId, 'SUPPLIES_TO', 'ASSUMED', 'analyst-entered direct market holding');
+    if (marketPosition) edge(positionId, marketId, positionRole === 'BORROWER' ? 'BORROWS_FROM' : 'SUPPLIES_TO', 'ASSUMED', positionRole === 'BORROWER' ? 'analyst-entered simulated borrower position' : 'analyst-entered direct market holding');
     else edge(vaultId, marketId, 'ALLOCATES_TO', 'OBSERVED', `state.allocation[marketId=${allocation.marketId}].supplyAssetsUsd`);
     edge(marketId, chainId, 'DEPLOYED_ON', 'OBSERVED', marketPosition ? 'market.chain.id' : 'vault.chain.id + market in vault allocation');
     if (allocation.collateral.address) {
