@@ -47,7 +47,7 @@ describe('financial integrity', () => {
     expect(result.vault.liquidityUsd).toBeNull();
   });
   it('rejects inconsistent vault identity and duplicated market IDs', () => {
-    expect(() => normalizeVault({ ...fixture(), chain: { id: 8453 } }, provenance)).toThrow();
+    expect(() => normalizeVault({ ...fixture(), chain: { id: 10 } }, provenance)).toThrow();
     const normalized = normalizeVault(fixture([row(M1, 6000000), row(M1, 4000000)]), provenance);
     expect(normalized.allocations).toHaveLength(1);
     expect(normalized.unquantifiedVaultUsd).toBe('4000000');

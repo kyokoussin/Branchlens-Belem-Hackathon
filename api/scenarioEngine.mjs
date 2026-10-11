@@ -1,6 +1,6 @@
-import { createHash } from 'node:crypto';
 import Decimal from 'decimal.js';
 import { unionExposure } from './riskEngine.mjs';
+import { stableId } from './stableId.mjs';
 
 // Coinbase's published Ethereum cbBTC contract, not a market or exposure fixture.
 export const CBBTC_ETHEREUM = '0xcbb7c0000ab88b473b1f5afd9ef808440eed33bf';
@@ -23,7 +23,7 @@ export function evaluatePriceDeviation({ baseline, observed, threshold = '0.10',
 
 // Public issuer claims are deliberately tagged DOCUMENTED, never OBSERVED on-chain.
 export function addDocumentedCbbtcDependencies(analysis) {
-  if (!analysis.vault.allocations.some((item) => item.collateral.address === CBBTC_ETHEREUM)) return analysis;
+  if (analysis.vault.chainId !== 1 || !analysis.vault.allocations.some((item) => item.collateral.address === CBBTC_ETHEREUM)) return analysis;
   const graph = { ...analysis.graph, nodes: [...analysis.graph.nodes], edges: [...analysis.graph.edges] };
   const tokenId = `token:${analysis.vault.chainId}:${CBBTC_ETHEREUM}`;
   const issuerId = 'organization:coinbase';
@@ -41,7 +41,7 @@ export function addDocumentedCbbtcDependencies(analysis) {
 
 export function simulateCbbtcDepeg(analysis, simulatedAt = new Date().toISOString()) {
   const { vault, graph, exposure } = analysis;
-  const affected = vault.allocations.filter((allocation) => allocation.collateral.address === CBBTC_ETHEREUM);
+  const affected = vault.chainId === 1 ? vault.allocations.filter((allocation) => allocation.collateral.address === CBBTC_ETHEREUM) : [];
   if (!affected.length) return {
     available: false,
     reason: 'The selected live vault has no funded Ethereum cbBTC collateral allocation.',
@@ -51,14 +51,15 @@ export function simulateCbbtcDepeg(analysis, simulatedAt = new Date().toISOStrin
 
   const marketIds = [...new Set(affected.map((allocation) => allocation.marketId))];
   const capitalExposedUsd = unionExposure(exposure, marketIds);
-  const positionId = `position:assumed:vault:${vault.chainId}:${vault.address}`;
+  const marketPosition = vault.version === 'MORPHO_MARKET';
+  const positionId = graph.nodes.find((node) => node.type === 'Position')?.id;
   const vaultId = `vault:${vault.chainId}:${vault.address}`;
   const collateralId = `token:${vault.chainId}:${CBBTC_ETHEREUM}`;
-  const dependencyPaths = marketIds.map((marketId) => [positionId, vaultId, `market:${vault.chainId}:${marketId}`, collateralId]);
+  const dependencyPaths = marketIds.map((marketId) => marketPosition ? [positionId, `market:${vault.chainId}:${marketId}`, collateralId] : [positionId, vaultId, `market:${vault.chainId}:${marketId}`, collateralId]);
   const pathsVerified = dependencyPaths.every((path) => path.slice(0, -1).every((from, index) => graph.edges.some((edge) => edge.from === from && edge.to === path[index + 1])));
   if (!pathsVerified) throw new Error('cbBTC graph paths could not be verified against the current Morpho snapshot.');
   const dedupKey = `belem-demo:${vault.chainId}:${vault.address}:CBBTC_RELATIVE_DEPEG_30`;
-  const id = `sim_${createHash('sha256').update(dedupKey).digest('hex').slice(0, 20)}`;
+  const id = `sim_${stableId(dedupKey)}`;
   const detectionRule = evaluatePriceDeviation({ baseline: '1', observed: '0.70', threshold: '0.10', provenance: 'SIMULATED_CBBTC_BTC_RELATIVE_PRICE' });
   if (detectionRule.status !== 'TRIGGERED') throw new Error('Hypothetical price-deviation rule did not trigger.');
 
@@ -67,7 +68,7 @@ export function simulateCbbtcDepeg(analysis, simulatedAt = new Date().toISOStrin
     available: true, status: 'SIMULATED_NOT_OBSERVED', severity: 'REVIEW_REQUIRED',
     title: 'Hypothetical cbBTC 30% depeg relative to BTC',
     whatHappened: 'Analyst-injected scenario: cbBTC falls 30% relative to its underlying BTC. No such event was detected by this application.',
-    whyItMatters: 'The selected vault funds Morpho markets that accept cbBTC collateral. A collateral shock could affect borrower health and lender recoveries; actual bad debt is not calculated.',
+    whyItMatters: marketPosition ? 'The selected Morpho market accepts cbBTC collateral. A collateral shock could affect borrower health and lender recoveries; actual bad debt is not calculated.' : 'The selected vault funds Morpho markets that accept cbBTC collateral. A collateral shock could affect borrower health and lender recoveries; actual bad debt is not calculated.',
     simulatedAt, liveSnapshotRetrievedAt: vault.provenance.retrievedAt,
     detectionRule,
     graphQlIndexedBlock: vault.provenance.indexedBlock,
@@ -93,7 +94,7 @@ export function simulateCbbtcDepeg(analysis, simulatedAt = new Date().toISOStrin
       { status: 'DOCUMENTED', field: 'cbBTC Ethereum contract and BTC backing claim', value: CBBTC_ETHEREUM, source: CBBTC_SOURCE, timestamp: null },
     ],
     exit: {
-      mechanism: 'VAULT_REDEEM',
+      mechanism: marketPosition ? 'MARKET_WITHDRAW' : 'VAULT_REDEEM',
       requestedWithdrawalUsd: exposure.assumedPrincipalUsd,
       reportedVaultWideLiquidityUsd: vault.liquidityUsd,
       restVaultWideWithdrawableAssetsTokens: vault.withdrawableAssetsTokens,

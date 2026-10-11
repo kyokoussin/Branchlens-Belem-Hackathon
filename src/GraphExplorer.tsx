@@ -5,7 +5,7 @@ import type { Graph, Impact, PortfolioData, Position } from './model';
 const money = (value: string | null | undefined) => value == null ? 'Not verified' : new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(Number(value));
 const short = (value: string) => value.length > 24 ? `${value.slice(0, 10)}…${value.slice(-6)}` : value;
 const mechanisms: Record<string, string> = {
-  Position: 'Its risk comes from the vault and the markets beneath it.', Vault: 'Allocation changes, smart-contract failure, or withdrawal constraints could affect this position.',
+  Position: 'Its risk comes from the verified vault or market and the dependencies beneath it.', Vault: 'Allocation changes, smart-contract failure, or withdrawal constraints could affect this position.',
   LendingMarket: 'Collateral impairment, liquidations, bad debt, or liquidity stress could affect lender recoveries.',
   CollateralToken: 'A price depeg, custody failure, or redemption disruption can weaken borrower collateral.',
   LoanToken: 'Loan-asset impairment or transfer restrictions can affect withdrawals and recoveries.',
@@ -17,9 +17,9 @@ const mechanisms: Record<string, string> = {
   Blockchain: 'Chain availability and settlement correctness affect every dependent market.',
 };
 
-export function GraphExplorer({ position, portfolio, view, selectedId, onSelect, onViewImpact, onReview }: { position: Position; portfolio: PortfolioData; view: 'dependency' | 'impact'; selectedId: string; onSelect: (id: string) => void; onViewImpact: (id: string) => void; onReview: () => void }) {
+export function GraphExplorer({ position, portfolio, view, selectedId, onSelect, onViewImpact, onReview, global = false }: { position: Position; portfolio: PortfolioData; view: 'dependency' | 'impact'; selectedId: string; onSelect: (id: string) => void; onViewImpact: (id: string) => void; onReview: () => void; global?: boolean }) {
   const analysis = position.analysis;
-  const impact: Impact | null = view === 'impact' ? portfolio.impactIndex[selectedId] || null : null;
+  const impact: Impact | null = view === 'impact' || global ? portfolio.impactIndex[selectedId] || null : null;
   // This is viewport history only. Exposure always comes from the selected node's impact.
   const [visibleImpactSelections, setVisibleImpactSelections] = useState<string[]>([]);
   useEffect(() => {
@@ -27,12 +27,13 @@ export function GraphExplorer({ position, portfolio, view, selectedId, onSelect,
     if (impact) setVisibleImpactSelections((previous) => previous.includes(selectedId) ? previous : [...previous, selectedId]);
   }, [view, selectedId, impact]);
   const graph: Graph = useMemo(() => {
+    if (global && view === 'dependency') return portfolio.portfolioGraph;
     if (!impact) return analysis.graph;
     const visibleImpacts = [impact, ...visibleImpactSelections.filter((id) => id !== selectedId).map((id) => portfolio.impactIndex[id]).filter((item): item is Impact => Boolean(item))];
     const nodeIds = new Set(visibleImpacts.flatMap((item) => item.affectedPositions.flatMap((position) => position.paths.flatMap((path) => path.nodeIds))));
     const edgeIds = new Set(visibleImpacts.flatMap((item) => item.affectedPositions.flatMap((position) => position.paths.flatMap((path) => path.edgeIds))));
     return { ...portfolio.portfolioGraph, nodes: portfolio.portfolioGraph.nodes.filter((node) => nodeIds.has(node.id)), edges: portfolio.portfolioGraph.edges.filter((edge) => edgeIds.has(edge.id)) };
-  }, [analysis.graph, impact, portfolio.portfolioGraph, portfolio.impactIndex, selectedId, visibleImpactSelections]);
+  }, [analysis.graph, impact, portfolio.portfolioGraph, portfolio.impactIndex, selectedId, visibleImpactSelections, global, view]);
   const layout = useMemo(() => layoutGraph(graph), [graph]);
   const viewport = useRef<HTMLDivElement>(null);
   const lastFitKey = useRef('');
@@ -42,7 +43,8 @@ export function GraphExplorer({ position, portfolio, view, selectedId, onSelect,
   const [focusedPositionId, setFocusedPositionId] = useState<string | null>(null);
   useEffect(() => setFocusedPositionId(null), [selectedId, view, portfolio.portfolioIncident?.id]);
   const selected = layout.byId.get(selectedId) || layout.nodes.find((node) => node.type === 'Position') || layout.nodes[0];
-  const scenario = position.simulation?.available ? position.simulation : null;
+  const scenarioCandidate = global ? portfolio.positions.find((item) => item.simulation?.available)?.simulation : position.simulation;
+  const scenario = scenarioCandidate?.available ? scenarioCandidate : null;
   const incidentMarkets = new Set(scenario?.marketIds || []);
   const relatedMarkets = new Set(selected?.affectedMarketIds || []);
   const impactPaths = impact?.affectedPositions.flatMap((item) => focusedPositionId && item.id !== focusedPositionId ? [] : item.paths) || [];
@@ -71,12 +73,12 @@ export function GraphExplorer({ position, portfolio, view, selectedId, onSelect,
 
   useLayoutEffect(() => {
     const el = viewport.current;
-    const key = `${position.id}:${view}:${portfolio.portfolioIncident?.id || 'baseline'}`;
+    const key = `${global ? 'global' : position.id}:${view}:${global && view === 'impact' ? selectedId : ''}:${portfolio.portfolioIncident?.id || 'baseline'}`;
     if (!el || lastFitKey.current === key) return;
     lastFitKey.current = key;
     const next = Math.max(0.08, Math.min(1, (el.clientWidth - 32) / layout.width, (el.clientHeight - 32) / layout.height));
     setZoom(next); setOffset({ x: 16, y: 16 });
-  }, [position.id, view, portfolio.portfolioIncident?.id, layout.width, layout.height]);
+  }, [position.id, view, selectedId, global, portfolio.portfolioIncident?.id, layout.width, layout.height]);
 
   function fit() {
     const el = viewport.current;
@@ -116,13 +118,13 @@ export function GraphExplorer({ position, portfolio, view, selectedId, onSelect,
       </div>
       <div className="graph-legend"><span><i className="legend-dot observed" />Observed Morpho link</span><span><i className="legend-dot documented" />Documented claim</span><span><i className="legend-dot assumed" />Assumed position</span></div>
     </section>
-    <aside className="inspector card">{view === 'impact' && impact ? <>
+    <aside className="inspector card">{(view === 'impact' || global) && impact ? <>
       <div className="eyebrow">{portfolio.portfolioIncident?.dependencyNodeId === selectedId ? 'SIMULATED INCIDENT · REVIEW REQUIRED' : 'REVERSE DEPENDENCY ANALYSIS'}</div>
       <h2>{impact.selectedLabel}</h2>
       <div className="inspector-sub"><span className="type-pill">{impact.selectedType.replace(/([a-z])([A-Z])/g, '$1 $2')}</span><span>{impact.evidenceStatuses.join(' / ') || 'ASSUMED'}</span></div>
       <p>{portfolio.portfolioIncident?.dependencyNodeId === selectedId ? portfolio.portfolioIncident.whatHappened : 'If this dependency fails, these tracked investments have a verified path to it. No failure has been detected here.'}</p>
       <div className="impact-summary" aria-label="Portfolio impact summary"><div><small>Affected positions</small><strong>{impact.affectedPositionCount}</strong></div><div><small>Distinct affected markets</small><strong>{impact.affectedMarketCount}</strong><small>{impact.affectedAllocationCount} funded allocations across positions</small></div><div className="wide"><small>Unique assumed principal exposed</small><strong>{money(impact.uniqueCapitalExposedUsd)}</strong></div><div className="wide"><small>Conditional maximum principal loss</small><strong>{money(impact.maximumConditionalPrincipalLossUsd)}</strong></div></div>
-      <p className="smallnote">{impact.maximumLossMeaning} Allocation weights come from the current Morpho vault state; repeated paths to a market count once per position.</p>
+      <p className="smallnote">{impact.maximumLossMeaning} Allocation weights come from verified Morpho vault allocations or direct market supply; repeated paths to a market count once per position.</p>
       <div className="inspect-list"><h3>Impacted investments and complete paths</h3>{impact.affectedPositions.length ? impact.affectedPositions.map((item) => <div className={`impact-position ${focusedPositionId === item.id ? 'focused' : ''}`} key={item.id}>
         <button className="impact-position-button" onClick={() => setFocusedPositionId(item.id)} aria-pressed={focusedPositionId === item.id}><strong>{item.name}</strong><span>{money(item.exposedPrincipalUsd)} exposed · {item.marketIds.length} market{item.marketIds.length === 1 ? '' : 's'}</span></button>
         <div className="impact-paths">{item.paths.map((path, index) => <p key={`${item.id}-${index}`} title={path.nodeIds.join(' → ')}><span className="path-index">Path {index + 1}</span>{path.nodeIds.map((id) => graphLabels.get(id) || id).join(' → ')}</p>)}</div>
@@ -130,11 +132,11 @@ export function GraphExplorer({ position, portfolio, view, selectedId, onSelect,
       </div>) : <p>No tracked position reaches this component in the current graph.</p>}</div>
       <div className="inspect-list"><h3>Decision still needed</h3><p>Verify the incident itself, borrower loss or recoverability, wallet-specific withdrawal capacity, and the execution quote before deciding to stay or exit.</p>{portfolio.portfolioIncident?.dependencyNodeId === selectedId && <button onClick={onReview}>Open incident report →</button>}</div>
       <div className="inspect-list"><h3>Sources and data freshness</h3>{impact.sources.map((source) => <p key={source}><a href={source} target="_blank" rel="noopener noreferrer">{source} ↗</a></p>)}<small>Observed links come from Morpho data. Documented issuer/backing links are company claims; assumed holdings are demonstration inputs.</small></div>
-    </> : <><div className="eyebrow">SELECTED DEPENDENCY</div><h2>{selected.type === 'Position' ? analysis.vault.name : selected.label}</h2><div className="inspector-sub"><span className="type-pill">{selected.type.replace(/([a-z])([A-Z])/g, '$1 $2')}</span><span>{statuses.length ? statuses.join(' / ') : 'ASSUMED'}</span></div>
+    </> : <><div className="eyebrow">SELECTED DEPENDENCY</div><h2>{selected.type === 'Position' ? position.name : selected.label}</h2><div className="inspector-sub"><span className="type-pill">{selected.type.replace(/([a-z])([A-Z])/g, '$1 $2')}</span><span>{statuses.length ? statuses.join(' / ') : 'ASSUMED'}</span></div>
       <div className="inspector-impact"><small>Capital linked to this branch</small><strong>{money(selected.capitalExposedUsd)}</strong><span>{selected.affectedMarketIds.length} funded market{selected.affectedMarketIds.length === 1 ? '' : 's'} · unique within this position</span></div>
       <button className="primary view-impact-button" onClick={() => onViewImpact(selected.id)}>View Portfolio Impact →</button>
-      {selected.type === 'Position' && <div className="inspect-list"><h3>Position at a glance</h3><p>{analysis.vault.asset.symbol} underlying · {analysis.vault.allocations.length} funded markets · {(Number(analysis.exposure.coverageRatio) * 100).toFixed(1)}% allocation coverage</p></div>}
-      {selected.type === 'LendingMarket' && <div className="inspect-list"><h3>Market state</h3>{(() => { const row = analysis.vault.allocations.find((item) => item.marketId === selected.id.split(':').pop()); return row && <><p><strong>{row.collateral.symbol} / {row.loan.symbol}</strong> · {money(row.allocationUsd)} allocated</p><p>Liquidity {money(row.marketLiquidityUsd)} · Utilization {row.utilization == null ? 'Unknown' : `${(Number(row.utilization) * 100).toFixed(1)}%`}</p></>; })()}</div>}
+      {selected.type === 'Position' && <div className="inspect-list"><h3>Position at a glance</h3><p>{analysis.vault.asset.symbol} {analysis.vault.version === 'MORPHO_MARKET' ? 'loan asset · direct market supply' : `underlying · ${analysis.vault.allocations.length} funded markets · ${(Number(analysis.exposure.coverageRatio) * 100).toFixed(1)}% allocation coverage`}</p></div>}
+      {selected.type === 'LendingMarket' && <div className="inspect-list"><h3>Market state</h3>{(() => { const row = analysis.vault.allocations.find((item) => item.marketId === selected.id.split(':').pop()); return row && <><p><strong>{row.collateral.symbol} / {row.loan.symbol}</strong> · {money(row.allocationUsd)} {analysis.vault.version === 'MORPHO_MARKET' ? 'market supply' : 'allocated'}</p><p>Liquidity {money(row.marketLiquidityUsd)} · Utilization {row.utilization == null ? 'Unknown' : `${(Number(row.utilization) * 100).toFixed(1)}%`}</p></>; })()}</div>}
       <div className="inspect-list"><h3>Risk observations</h3>{scenario && selected.id === cbBtcNode?.id && <p className="signal-warning">Simulated −30% price deviation · not a live observation <button onClick={onReview}>Review incident →</button></p>}{relatedFindings.slice(0, 3).map((finding) => <p key={finding.id}><strong>{finding.signalType === 'STRUCTURAL_WARNING' ? 'Concentration' : finding.status}</strong> · {finding.title}</p>)}{relatedFindings.length === 0 && !(scenario && selected.id === cbBtcNode?.id) && <p>No verified failure signal for this component.</p>}<p>{mechanisms[selected.type] || 'Specific failure impact requires further analysis.'}</p></div>
       <div className="inspect-list"><h3>Evidence & freshness</h3>{sources.map((source) => <p key={source}><a href={source} target="_blank" rel="noopener noreferrer">{source.includes('coinbase') ? 'Coinbase documentation' : 'Morpho API source'} ↗</a></p>)}<small>{position.dataMode === 'LIVE_API' ? 'Live API retrieved' : 'Historical snapshot retrieved'} {new Date(analysis.vault.provenance.retrievedAt).toLocaleString()}. {analysis.vault.provenance.sourceTimestamp ? 'Source time available.' : 'GraphQL index time not provided.'}</small><details className="technical-details"><summary>Technical details</summary>{selected.address && <p>{selected.type === 'LendingMarket' ? 'Market ID' : 'Address'} {/^0x[0-9a-fA-F]{40}$/.test(selected.address) ? <a href={`https://etherscan.io/address/${selected.address}`} target="_blank" rel="noopener noreferrer"><code>{selected.address}</code></a> : <code>{selected.address}</code>}</p>}<p>{analysis.graph.nodes.length} discovered nodes · {analysis.vault.allocations.length} allocations</p></details></div></>}
     </aside>

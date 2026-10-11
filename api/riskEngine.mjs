@@ -14,7 +14,7 @@ export class DataError extends Error {
 }
 
 export function normalizeVault(raw, provenance) {
-  if (!raw || raw.chain?.id !== 1 || !addr(raw.address)) throw new DataError('Vault chain or address is invalid.');
+  if (!raw || ![1, 8453].includes(raw.chain?.id) || !addr(raw.address)) throw new DataError('Vault chain or address is invalid.');
   const total = raw.state?.totalAssetsUsd;
   if (total == null || !D(total).isFinite() || D(total).lte(0)) throw new DataError('Vault total USD value is missing or invalid.');
   const asset = raw.asset || {};
@@ -66,11 +66,42 @@ export function normalizeVault(raw, provenance) {
   const restWithdrawable = provenance.restState?.withdrawableAssetsRaw;
   const withdrawableAssetsTokens = restWithdrawable == null ? null : D(restWithdrawable).div(D(10).pow(asset.decimals)).toString();
   return {
-    version: 'MORPHO_V1', chainId: 1, address: raw.address.toLowerCase(), name: raw.name || 'Unnamed Morpho vault',
+    version: 'MORPHO_V1', chainId: raw.chain.id, address: raw.address.toLowerCase(), name: raw.name || 'Unnamed Morpho vault',
     asset: { address: addr(asset.address), symbol: asset.symbol || 'Unknown', decimals: asset.decimals },
     totalUsd: D(total).toString(), liquidityUsd, withdrawableAssetsTokens,
     allocations, knownAllocatedUsd: known.toString(), unquantifiedVaultUsd: unquantified.toString(),
     warnings, provenance,
+  };
+}
+
+export function normalizeMarket(raw, provenance) {
+  if (!raw || ![1, 8453].includes(raw.chain?.id) || !/^0x[0-9a-fA-F]{64}$/.test(raw.marketId || '')) throw new DataError('Market chain or ID is invalid.');
+  const loan = raw.loanAsset || {};
+  if (!addr(loan.address) || !Number.isInteger(loan.decimals) || loan.decimals < 0 || loan.decimals > 36) throw new DataError('Market loan-token address or decimals are missing.');
+  const total = raw.state?.supplyAssetsUsd;
+  if (total == null || !D(total).isFinite() || D(total).lte(0)) throw new DataError('Market supply USD value is missing or invalid.');
+  const liquidity = raw.state?.liquidityAssetsUsd;
+  const collateral = raw.collateralAsset || {};
+  const oracle = raw.oracle || {};
+  const allocation = {
+    marketId: raw.marketId.toLowerCase(), allocationUsd: D(total).toString(),
+    collateral: { address: addr(collateral.address), symbol: collateral.symbol || 'Unknown', decimals: Number.isInteger(collateral.decimals) ? collateral.decimals : null },
+    loan: { address: addr(loan.address), symbol: loan.symbol || 'Unknown', decimals: loan.decimals },
+    oracleAddress: addr(oracle.address), oracleType: oracle.type || null,
+    oracleData: oracle.data ? Object.fromEntries(Object.entries(oracle.data).map(([key, value]) => [key, addr(value?.address)]).filter(([, value]) => value)) : null,
+    irmAddress: addr(raw.irmAddress),
+    lltv: raw.lltv == null ? null : D(raw.lltv).div('1000000000000000000').toString(),
+    utilization: raw.state?.utilization == null || !D(raw.state.utilization).isFinite() ? null : D(raw.state.utilization).toString(),
+    marketSupplyUsd: D(total).toString(),
+    marketBorrowUsd: raw.state?.borrowAssetsUsd == null ? null : D(raw.state.borrowAssetsUsd).toString(),
+    marketLiquidityUsd: liquidity == null || !D(liquidity).isFinite() ? null : D(liquidity).toString(),
+  };
+  return {
+    version: 'MORPHO_MARKET', chainId: raw.chain.id, address: allocation.marketId,
+    name: `Morpho ${allocation.collateral.symbol}/${allocation.loan.symbol}`,
+    asset: { address: allocation.loan.address, symbol: allocation.loan.symbol, decimals: loan.decimals },
+    totalUsd: D(total).toString(), liquidityUsd: allocation.marketLiquidityUsd, withdrawableAssetsTokens: null,
+    allocations: [allocation], knownAllocatedUsd: D(total).toString(), unquantifiedVaultUsd: '0', warnings: [], provenance,
   };
 }
 
@@ -88,44 +119,48 @@ export function buildGraph(vault) {
     if (seenEdges.has(id)) return;
     seenEdges.add(id); edges.push({ id, from, to, type, status, evidence: evidence(field) });
   }
-  const chainId = 'chain:1';
-  const vaultId = `vault:1:${vault.address}`;
-  const positionId = `position:assumed:${vaultId}`;
-  node(chainId, 'Blockchain', 'Ethereum');
-  node(vaultId, 'Vault', vault.name, vault.address);
+  const chainId = `chain:${vault.chainId}`;
+  const marketPosition = vault.version === 'MORPHO_MARKET';
+  const vaultId = `vault:${vault.chainId}:${vault.address}`;
+  const positionId = `position:assumed:${marketPosition ? `market:${vault.chainId}:${vault.address}` : vaultId}`;
+  node(chainId, 'Blockchain', vault.chainId === 1 ? 'Ethereum' : 'Base');
   node(positionId, 'Position', 'Illustrative position');
-  edge(positionId, vaultId, 'HOLDS', 'ASSUMED', 'analyst-entered position');
-  edge(vaultId, chainId, 'DEPLOYED_ON', 'OBSERVED', 'vault.chain.id');
-  const depositId = `token:1:${vault.asset.address}`;
-  node(depositId, 'LoanToken', `${vault.asset.symbol} deposit asset`, vault.asset.address);
-  edge(vaultId, depositId, 'HOLDS', 'OBSERVED', 'vault.asset');
+  if (!marketPosition) {
+    node(vaultId, 'Vault', vault.name, vault.address);
+    edge(positionId, vaultId, 'HOLDS', 'ASSUMED', 'analyst-entered position');
+    edge(vaultId, chainId, 'DEPLOYED_ON', 'OBSERVED', 'vault.chain.id');
+    const depositId = `token:${vault.chainId}:${vault.asset.address}`;
+    node(depositId, 'LoanToken', `${vault.asset.symbol} deposit asset`, vault.asset.address);
+    edge(vaultId, depositId, 'HOLDS', 'OBSERVED', 'vault.asset');
+  }
   for (const allocation of vault.allocations) {
-    const marketId = `market:1:${allocation.marketId}`;
+    const marketId = `market:${vault.chainId}:${allocation.marketId}`;
     node(marketId, 'LendingMarket', `Morpho ${allocation.collateral.symbol}/${allocation.loan.symbol}`, allocation.marketId);
-    edge(vaultId, marketId, 'ALLOCATES_TO', 'OBSERVED', `state.allocation[marketId=${allocation.marketId}].supplyAssetsUsd`);
-    edge(marketId, chainId, 'DEPLOYED_ON', 'OBSERVED', 'vault.chain.id + market in vault allocation');
+    if (marketPosition) edge(positionId, marketId, 'SUPPLIES_TO', 'ASSUMED', 'analyst-entered direct market holding');
+    else edge(vaultId, marketId, 'ALLOCATES_TO', 'OBSERVED', `state.allocation[marketId=${allocation.marketId}].supplyAssetsUsd`);
+    edge(marketId, chainId, 'DEPLOYED_ON', 'OBSERVED', marketPosition ? 'market.chain.id' : 'vault.chain.id + market in vault allocation');
     if (allocation.collateral.address) {
-      const collateralId = `token:1:${allocation.collateral.address}`;
+      const collateralId = `token:${vault.chainId}:${allocation.collateral.address}`;
       node(collateralId, 'CollateralToken', allocation.collateral.symbol, allocation.collateral.address);
       edge(marketId, collateralId, 'SECURED_BY', 'OBSERVED', 'market.collateralAsset.address');
     }
     if (allocation.loan.address) {
-      const loanId = `token:1:${allocation.loan.address}`;
+      const loanId = `token:${vault.chainId}:${allocation.loan.address}`;
       node(loanId, 'LoanToken', allocation.loan.symbol, allocation.loan.address);
       edge(marketId, loanId, 'SUPPLIES_TO', 'OBSERVED', 'market.loanAsset.address');
     }
     if (allocation.oracleAddress) {
-      const oracleId = `oracle:1:${allocation.oracleAddress}`;
+      const oracleId = `oracle:${vault.chainId}:${allocation.oracleAddress}`;
       node(oracleId, 'Oracle', `${allocation.oracleType || 'Market oracle'} · ${shortAddress(allocation.oracleAddress)}`, allocation.oracleAddress);
       edge(marketId, oracleId, 'PRICED_BY', 'OBSERVED', 'market.oracle.address');
       for (const [role, address] of Object.entries(allocation.oracleData || {})) {
-        const upstreamId = `${role.toLowerCase().includes('vault') ? 'oracle-vault' : 'feed'}:1:${address}`;
+        const upstreamId = `${role.toLowerCase().includes('vault') ? 'oracle-vault' : 'feed'}:${vault.chainId}:${address}`;
         node(upstreamId, role.toLowerCase().includes('vault') ? 'OracleVault' : 'OracleFeed', `${role.replace(/([A-Z])/g, ' $1').trim()} · ${shortAddress(address)}`, address);
         edge(oracleId, upstreamId, 'USES_UPSTREAM', 'OBSERVED', `market.oracle.data.${role}.address`);
       }
     }
   }
-  return { nodes, edges, coverage: 'Funded Morpho V1 allocations only; issuer, backing, governance and external protocol branches are NOT_ANALYZED.' };
+  return { nodes, edges, coverage: marketPosition ? 'Direct Morpho market supply and immutable market parameters; borrower health, issuer, governance and external protocol branches are NOT_ANALYZED.' : 'Funded Morpho V1 allocations only; issuer, backing, governance and external protocol branches are NOT_ANALYZED.' };
 }
 
 export function calculateExposure(vault, positionUsd) {
@@ -162,17 +197,18 @@ export function detectRisks(vault, exposure, options = {}) {
   const requested = D(exposure.assumedPrincipalUsd);
   const liquidity = vault.liquidityUsd == null ? null : D(vault.liquidityUsd);
   const liquidityTriggered = liquidity != null && requested.gt(liquidity);
+  const marketPosition = vault.version === 'MORPHO_MARKET';
   findings.push({
-    id: `liquidity:1:${vault.address}`, detector: 'WITHDRAWAL_LIQUIDITY_CONSTRAINT',
+    id: `liquidity:${vault.chainId}:${vault.address}`, detector: 'WITHDRAWAL_LIQUIDITY_CONSTRAINT',
     category: 'LIQUIDITY_CONSTRAINT', status: liquidity == null ? 'UNKNOWN' : liquidityTriggered ? 'TRIGGERED' : 'NOT_TRIGGERED',
     signalType: liquidityTriggered ? 'STRUCTURAL_WARNING' : 'CAPACITY_CHECK', severity: liquidityTriggered ? 'warning' : 'info',
-    title: liquidityTriggered ? 'Reported vault liquidity is below requested withdrawal' : 'Reported vault liquidity check',
-    description: 'Morpho reports global vault liquidity, not a wallet-specific redeemability or executable withdrawal quote.',
-    subjectId: `vault:1:${vault.address}`,
+    title: liquidityTriggered ? `Reported ${marketPosition ? 'market' : 'vault'} liquidity is below requested withdrawal` : `Reported ${marketPosition ? 'market' : 'vault'} liquidity check`,
+    description: `Morpho reports global ${marketPosition ? 'market' : 'vault'} liquidity, not a wallet-specific redeemability or executable withdrawal quote.`,
+    subjectId: marketPosition ? `market:${vault.chainId}:${vault.address}` : `vault:${vault.chainId}:${vault.address}`,
     affectedMarketIds: liquidityTriggered ? vault.allocations.map((a) => a.marketId) : [],
     capitalExposedUsd: liquidityTriggered ? exposure.assumedPrincipalUsd : '0.00',
     maxPrincipalAtRiskUsd: liquidityTriggered ? exposure.assumedPrincipalUsd : '0.00',
-    evidence: [{ field: 'vault.liquidity.usd', observed: vault.liquidityUsd, comparator: '< requested withdrawal USD', threshold: exposure.assumedPrincipalUsd, source: 'https://api.morpho.org/graphql', sourceTimestamp: vault.provenance.sourceTimestamp }],
+    evidence: [{ field: marketPosition ? 'market.state.liquidityAssetsUsd' : 'vault.liquidity.usd', observed: vault.liquidityUsd, comparator: '< requested withdrawal USD', threshold: exposure.assumedPrincipalUsd, source: 'https://api.morpho.org/graphql', sourceTimestamp: vault.provenance.sourceTimestamp }],
     missing: ['Wallet-specific maxWithdraw and adapter gating are not verified.', 'Global liquidity does not guarantee an exit.'],
   });
   const groups = new Map();
@@ -187,7 +223,7 @@ export function detectRisks(vault, exposure, options = {}) {
   }
   const shared = [...groups.values()].filter((group) => group.rows.length > 1);
   if (shared.length === 0) {
-    findings.push({ id: `concentration:1:${vault.address}:none`, detector: 'SHARED_DEPENDENCY_CONCENTRATION', category: 'EXPOSURE_WARNING', status: 'NOT_TRIGGERED', signalType: 'STRUCTURAL_WARNING', severity: 'info', title: 'No repeated collateral or oracle dependency in funded markets', description: 'Only verified funded allocations were checked.', subjectId: `vault:1:${vault.address}`, affectedMarketIds: [], capitalExposedUsd: '0.00', maxPrincipalAtRiskUsd: '0.00', evidence: [{ field: 'state.allocation', observed: `${vault.allocations.length} funded markets`, threshold: `${D(threshold).mul(100)}%`, source: 'https://api.morpho.org/graphql' }], missing: [] });
+    findings.push({ id: `concentration:${vault.chainId}:${vault.address}:none`, detector: 'SHARED_DEPENDENCY_CONCENTRATION', category: 'EXPOSURE_WARNING', status: 'NOT_TRIGGERED', signalType: 'STRUCTURAL_WARNING', severity: 'info', title: 'No repeated collateral or oracle dependency in funded markets', description: 'Only verified funded allocations were checked.', subjectId: `vault:${vault.chainId}:${vault.address}`, affectedMarketIds: [], capitalExposedUsd: '0.00', maxPrincipalAtRiskUsd: '0.00', evidence: [{ field: 'state.allocation', observed: `${vault.allocations.length} funded markets`, threshold: `${D(threshold).mul(100)}%`, source: 'https://api.morpho.org/graphql' }], missing: [] });
   }
   for (const group of shared) {
     const ids = group.rows.map((row) => row.marketId);
@@ -196,12 +232,12 @@ export function detectRisks(vault, exposure, options = {}) {
     const triggered = share.gte(threshold);
     const exposed = unionExposure(exposure, ids);
     findings.push({
-      id: `concentration:1:${vault.address}:${group.kind}:${group.address}`,
+      id: `concentration:${vault.chainId}:${vault.address}:${group.kind}:${group.address}`,
       detector: 'SHARED_DEPENDENCY_CONCENTRATION', category: 'EXPOSURE_WARNING', status: triggered ? 'TRIGGERED' : 'NOT_TRIGGERED',
       signalType: 'STRUCTURAL_WARNING', severity: triggered ? 'warning' : 'info',
       title: `${group.symbol} shared across ${group.rows.length} funded markets`,
       description: 'A shared dependency concentrates exposure. This is not evidence of an active exploit or failure.',
-      subjectId: `${group.kind === 'oracle' ? 'oracle' : 'token'}:1:${group.address}`,
+      subjectId: `${group.kind === 'oracle' ? 'oracle' : 'token'}:${vault.chainId}:${group.address}`,
       affectedMarketIds: ids, capitalExposedUsd: exposed, maxPrincipalAtRiskUsd: exposed,
       evidence: [{ field: `state.allocation grouped by ${group.kind}.address`, observed: ratio(share), comparator: '>=', threshold: String(threshold), rawAllocatedUsd: money(allocated), marketIds: ids, source: 'https://api.morpho.org/graphql', sourceTimestamp: vault.provenance.sourceTimestamp }],
       missing: ['No incident has been detected for this dependency. The full-loss bound is conditional, not a forecast.'],
@@ -219,4 +255,14 @@ export function analyze(raw, provenance, positionUsd = '1000000', options = {}) 
   const affectedIds = findings.filter((item) => item.status === 'TRIGGERED').flatMap((item) => item.affectedMarketIds);
   const uniqueAffectedUsd = unionExposure(exposure, affectedIds);
   return { vault, graph, exposure, findings, summary: { triggeredCount: findings.filter((f) => f.status === 'TRIGGERED').length, uniqueAffectedUsd, maxPrincipalAtRiskUsd: uniqueAffectedUsd, meaning: 'Maximum conditional principal at risk if all affected allocations lose 100% of principal; not a loss prediction or probability.' } };
+}
+
+export function analyzeMarket(raw, provenance, positionUsd = '1000000', options = {}) {
+  const market = normalizeMarket(raw, provenance);
+  const graph = buildGraph(market);
+  const exposure = calculateExposure(market, positionUsd);
+  const findings = detectRisks(market, exposure, options);
+  const affectedIds = findings.filter((item) => item.status === 'TRIGGERED').flatMap((item) => item.affectedMarketIds);
+  const uniqueAffectedUsd = unionExposure(exposure, affectedIds);
+  return { vault: market, graph, exposure, findings, summary: { triggeredCount: findings.filter((f) => f.status === 'TRIGGERED').length, uniqueAffectedUsd, maxPrincipalAtRiskUsd: uniqueAffectedUsd, meaning: 'Maximum conditional principal at risk if all affected allocations lose 100% of principal; not a loss prediction or probability.' } };
 }

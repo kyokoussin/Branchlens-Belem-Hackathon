@@ -18,7 +18,7 @@ export function mergePortfolioGraph(positions) {
     const translate = (id) => id === original.id ? trackedId : id;
     for (const node of graph.nodes) {
       const id = translate(node.id);
-      if (!nodes.has(id)) nodes.set(id, { ...node, id, label: node.type === 'Position' ? position.analysis.vault.name : node.label });
+      if (!nodes.has(id)) nodes.set(id, { ...node, id, label: node.type === 'Position' ? (position.name || position.analysis.vault.name) : node.label });
     }
     for (const edge of graph.edges) {
       const from = translate(edge.from);
@@ -73,7 +73,7 @@ export function buildImpactIndex(positions) {
       for (const id of marketIds) affectedMarketIds.add(id);
       const exposedPrincipalUsd = vaultWide ? position.amountUsd : unionExposure(position.analysis.exposure, [...marketIds]);
       affectedPositions.push({
-        id: position.id, name: position.analysis.vault.name, assumedPrincipalUsd: position.amountUsd,
+        id: position.id, name: position.name || position.analysis.vault.name, assumedPrincipalUsd: position.amountUsd,
         exposedPrincipalUsd, marketIds: [...marketIds], paths,
         dataMode: position.dataMode, retrievedAt: position.analysis.vault.provenance.retrievedAt,
         snapshotCapturedAt: position.snapshotCapturedAt,

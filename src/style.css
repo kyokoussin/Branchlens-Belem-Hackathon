@@ -322,3 +322,56 @@ body { overflow-x: hidden; }
 .analysis-workspace .graph-viewport { height: min(74vh, 740px); min-height: 510px; }
 @media (max-width: 760px) { .home-workspace { padding-top: 0; } .home-workspace .home-hero { min-height: 100svh; padding: 44px 25px; background-position: 18% center; } .home-hero .hero-overline { font-size: 9px; } .home-hero h1 { font-size: clamp(60px, 14vw, 86px); } .home-hero .hero-tagline { font-size: 25px; } .home-hero .hero-description { font-size: 15px; } .analysis-workspace { padding-top: 86px; } .explorer-overview { display: block; } .explorer-position-context { width: 100%; margin-top: 16px; } .screen-source { width: 100%; margin-left: 0; } }
 @media (prefers-reduced-motion: reduce) { .site-header { transition: none; } }
+
+/* Portfolio controls reuse the existing analyst cards and graph panel. */
+.search-panel { margin: 20px 0 26px; padding: 20px 24px; }
+.search-panel.compact { margin: 2px 0 12px; padding: 12px 16px; }
+.search-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 12px; }
+.search-heading h2 { margin: 3px 0 0; font-size: 19px; }
+.search-panel.compact .search-heading h2 { font-size: 14px; }
+.search-panel > input, .graph-node-search > input { width: 100%; min-height: 42px; border: 1px solid #c8d9dc; border-radius: 7px; padding: 9px 12px; background: #fff; color: #142437; font: inherit; }
+.portfolio-filter-chips, .graph-scope { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; margin: 12px 0; }
+.portfolio-filter-chips > span, .graph-scope > span { margin-right: 5px; color: #52706f; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .07em; }
+.portfolio-filter-chips button, .graph-scope button { padding: 7px 11px; font-size: 11px; }
+.portfolio-filter-chips button.active, .graph-scope button.active { color: #fff; background: #112136; border-color: #112136; }
+.filter-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 9px; }
+.filter-grid label, .position-form label { display: flex; flex-direction: column; gap: 5px; color: #4e696c; font-size: 11px; font-weight: 750; }
+.filter-grid select, .position-form input, .position-form select, .inline-form input, .portfolio-management-list input { width: 100%; min-width: 0; min-height: 37px; border: 1px solid #c8d9dc; border-radius: 6px; padding: 7px 9px; background: #fff; color: #17283b; font: inherit; }
+.search-results { margin-top: 13px; border-top: 1px solid #e4ecef; padding-top: 12px; font-size: 12px; }
+.result-links { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px; }
+.result-links button { display: flex; align-items: center; gap: 7px; max-width: 100%; padding: 8px 10px; font-size: 11px; }
+.result-links button span { color: #538283; font-size: 8px; font-weight: 800; letter-spacing: .07em; }
+.result-links button small { color: #71828d; }
+.global-graph-summary { display: flex; flex-direction: column; gap: 4px; color: #405d64; }
+.global-graph-summary strong { color: #102035; font-size: 18px; }
+.graph-node-search { position: relative; margin: 5px 0 12px; max-width: 650px; }
+.graph-node-results { position: absolute; z-index: 5; top: 100%; left: 0; right: 0; display: grid; max-height: 300px; overflow: auto; padding: 7px; border: 1px solid #d8e4e6; border-radius: 7px; background: #fff; box-shadow: 0 14px 25px #1c2d401f; }
+.graph-node-results button { text-align: left; border: 0; background: transparent; }
+.graph-node-results button:hover { background: #eaf6f3; }
+.empty-graph { padding: 40px; }
+.management-page > h1 { margin: 5px 0; font-size: 36px; }
+.management-page > p { color: #5c6d79; }
+.manage-section { margin: 18px 0; padding: 24px; }
+.manage-section h2 { margin: 0 0 15px; font-size: 20px; }
+.portfolio-management-list { display: grid; gap: 7px; }
+.portfolio-management-list > div, .managed-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #e6ecf0; }
+.portfolio-management-list > div strong { min-width: 175px; }
+.portfolio-management-list > div span { margin-right: auto; color: #667b83; font-size: 12px; }
+.portfolio-management-list input { max-width: 230px; }
+.inline-form { display: flex; gap: 8px; max-width: 500px; margin-top: 15px; }
+.position-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; }
+.position-form label small { color: #7a8a94; font-weight: 400; }
+.position-form input, .position-form select { font-size: 13px; }
+.form-actions { display: flex; gap: 9px; margin: 18px 0; }
+.form-error, .form-success { padding: 12px 15px; border-radius: 7px; margin: 13px 0; }
+.form-error { color: #8a2733; background: #fff0f0; border: 1px solid #e9b9c0; }
+.form-success { color: #205c51; background: #eaf8f4; border: 1px solid #bee8dc; }
+.managed-group { margin-top: 15px; }
+.managed-group h3 { margin: 0; font-size: 14px; color: #395b60; }
+.managed-row { justify-content: space-between; align-items: flex-start; }
+.managed-row > div:first-child { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.managed-row small { color: #60777f; }
+.managed-row code { overflow-wrap: anywhere; color: #7a8990; font-size: 10px; }
+.managed-row > div:last-child { display: flex; gap: 6px; }
+@media (max-width: 1050px) { .filter-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 760px) { .filter-grid, .position-form { grid-template-columns: 1fr; } .portfolio-management-list > div { flex-wrap: wrap; } .managed-row { flex-direction: column; } .search-panel { padding: 16px; } .global-graph-summary { margin-top: 14px; } }

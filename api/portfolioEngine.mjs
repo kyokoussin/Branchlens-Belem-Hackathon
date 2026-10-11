@@ -1,7 +1,7 @@
 import Decimal from 'decimal.js';
 import { DEMO_POSITIONS } from './portfolioConfig.mjs';
-import { fetchMorphoVault } from './morphoClient.mjs';
-import { analyze, DataError, unionExposure } from './riskEngine.mjs';
+import { fetchMorphoMarket, fetchMorphoVault } from './morphoClient.mjs';
+import { analyze, analyzeMarket, DataError, unionExposure } from './riskEngine.mjs';
 import { formatIncidents } from './incidentFormatter.mjs';
 import { addDocumentedCbbtcDependencies, evaluatePriceDeviation, simulateCbbtcDepeg } from './scenarioEngine.mjs';
 import { CBBTC_ETHEREUM } from './scenarioEngine.mjs';
@@ -9,6 +9,8 @@ import { buildImpactIndex } from './portfolioImpact.mjs';
 
 const money = (number) => new Decimal(number).toDecimalPlaces(2).toFixed(2);
 const monitoringBaseline = new Map();
+const fetchMorphoSubject = (address, chainId) => address.length === 66 ? fetchMorphoMarket(address, chainId) : fetchMorphoVault(address, chainId);
+const analyzeSubject = (entry, amountUsd, address) => address.length === 66 ? analyzeMarket(entry.raw, entry.provenance, amountUsd) : analyze(entry.raw, entry.provenance, amountUsd);
 
 export function addGraphImpact(analysis) {
   const { graph, vault, exposure } = analysis;
@@ -40,7 +42,7 @@ export function addGraphImpact(analysis) {
   return { ...analysis, graph: { ...graph, nodes } };
 }
 
-export async function buildPortfolio({ source = 'auto', scenario = false, snapshot, fetchVault = fetchMorphoVault, positions = DEMO_POSITIONS }) {
+export async function buildPortfolio({ source = 'auto', scenario = false, snapshot, fetchVault = fetchMorphoSubject, positions = DEMO_POSITIONS }) {
   if (!['auto', 'snapshot'].includes(source)) throw new DataError('Unknown data source mode.');
   if (snapshot?.kind !== 'VERIFIED_HISTORICAL_MORPHO_API_SNAPSHOT' || !snapshot.capturedAt || !Array.isArray(snapshot.positions)) throw new DataError('Verified demo snapshot is missing or invalid.');
   const loaded = await Promise.all(positions.map(async (position) => {
@@ -51,8 +53,8 @@ export async function buildPortfolio({ source = 'auto', scenario = false, snapsh
       try {
         for (let attempt = 0; attempt < 2; attempt++) {
           try {
-            entry = await fetchVault(position.address);
-            analyze(entry.raw, entry.provenance, position.amountUsd);
+            entry = await fetchVault(position.address, position.chainId || 1);
+            analyzeSubject(entry, position.amountUsd, position.address);
             if (attempt) warning = 'An initially inconsistent API response was replaced by a fresh, validated response.';
             break;
           } catch (error) {
@@ -65,11 +67,12 @@ export async function buildPortfolio({ source = 'auto', scenario = false, snapsh
       }
     } else mode = 'SAVED_HISTORICAL_SNAPSHOT';
     if (mode === 'SAVED_HISTORICAL_SNAPSHOT') {
-      const stored = snapshot.positions.find((item) => item.id === position.id && item.address.toLowerCase() === position.address.toLowerCase());
+      const stored = snapshot.positions.find((item) => item.id === position.id && item.address.toLowerCase() === position.address.toLowerCase() && (item.chainId || 1) === (position.chainId || 1));
       if (!stored) throw new DataError(`No verified historical snapshot for ${position.id}.`);
-      entry = { raw: stored.raw, provenance: { ...stored.provenance, retrievedAt: stored.provenance.retrievedAt, snapshotCapturedAt: snapshot.capturedAt } };
+      entry = { raw: stored.raw, provenance: { ...stored.provenance, retrievedAt: stored.provenance.retrievedAt, snapshotCapturedAt: stored.capturedAt || snapshot.capturedAt } };
     }
-    const analysis = addGraphImpact(addDocumentedCbbtcDependencies(formatIncidents(analyze(entry.raw, entry.provenance, position.amountUsd))));
+    const analysis = addGraphImpact(addDocumentedCbbtcDependencies(formatIncidents(analyzeSubject(entry, position.amountUsd, position.address))));
+    analysis.graph.nodes = analysis.graph.nodes.map((node) => node.type === 'Position' ? { ...node, label: position.name || analysis.vault.name } : node);
     if (warning) analysis.vault.warnings.push(warning);
     const previous = monitoringBaseline.get(position.id);
     const current = {
@@ -84,8 +87,12 @@ export async function buildPortfolio({ source = 'auto', scenario = false, snapsh
     ].filter(Boolean) : [];
     if (mode === 'LIVE_API') monitoringBaseline.set(position.id, current);
     const simulation = scenario ? simulateCbbtcDepeg(analysis) : null;
-    return { id: position.id, address: position.address, description: position.description, amountUsd: money(position.amountUsd), dataMode: mode, snapshotCapturedAt: mode === 'SAVED_HISTORICAL_SNAPSHOT' ? snapshot.capturedAt : null, changes, analysis, simulation, livePriceSignal: evaluatePriceDeviation({ baseline: null, observed: null, provenance: null }) };
+    return { id: position.id, name: position.name || analysis.vault.name, portfolioId: position.portfolioId || 'demo', chainId: position.chainId || 1, address: position.address, description: position.description || '', amountUsd: money(position.amountUsd), dataMode: mode, snapshotCapturedAt: mode === 'SAVED_HISTORICAL_SNAPSHOT' ? entry.provenance.snapshotCapturedAt : null, changes, analysis, simulation, livePriceSignal: evaluatePriceDeviation({ baseline: null, observed: null, provenance: null }) };
   }));
+  return aggregateLoadedPortfolio(loaded, scenario, snapshot.capturedAt);
+}
+
+export function aggregateLoadedPortfolio(loaded, scenario = false, snapshotCapturedAt = null) {
   const { graph: portfolioGraph, impacts: impactIndex } = buildImpactIndex(loaded);
   const cbBtcNodeId = `token:1:${CBBTC_ETHEREUM}`;
   const cbBtcImpact = impactIndex[cbBtcNodeId];
@@ -111,12 +118,12 @@ export async function buildPortfolio({ source = 'auto', scenario = false, snapsh
   } : null;
   const dependencyIds = new Set(loaded.flatMap((item) => item.analysis.graph.nodes.filter((node) => node.type !== 'Position').map((node) => node.id)));
   return {
-    mode: loaded.every((item) => item.dataMode === 'LIVE_API') ? 'LIVE_API' : loaded.every((item) => item.dataMode === 'SAVED_HISTORICAL_SNAPSHOT') ? 'SAVED_HISTORICAL_SNAPSHOT' : 'MIXED_LIVE_AND_SNAPSHOT',
+    mode: loaded.length === 0 ? 'EMPTY' : loaded.every((item) => item.dataMode === 'LIVE_API') ? 'LIVE_API' : loaded.every((item) => item.dataMode === 'SAVED_HISTORICAL_SNAPSHOT') ? 'SAVED_HISTORICAL_SNAPSHOT' : 'MIXED_LIVE_AND_SNAPSHOT',
     portfolio: { totalAssumedCapitalUsd: money(loaded.reduce((sum, item) => sum.plus(item.amountUsd), new Decimal(0))), trackedPositions: loaded.length, trackedDependencyRelationships: portfolioGraph.edges.length, distinctDependencies: dependencyIds.size, activeAlerts: portfolioIncident ? 1 : 0 },
     positions: loaded,
     portfolioGraph,
     impactIndex,
     portfolioIncident,
-    snapshotCapturedAt: snapshot.capturedAt,
+    snapshotCapturedAt,
   };
 }
