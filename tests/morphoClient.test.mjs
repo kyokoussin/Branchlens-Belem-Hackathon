@@ -4,6 +4,16 @@ import { DEFAULT_VAULT, fetchMorphoMarketCatalog, fetchMorphoVault } from '../ap
 afterEach(() => vi.unstubAllGlobals());
 
 describe('live Morpho source handling', () => {
+  it('reads vault accounting version from the verified REST identity', async () => {
+    vi.stubGlobal('fetch', vi.fn(async (url) => new Response(JSON.stringify(url.endsWith('/graphql')
+      ? { data: { vaultByAddress: { address: DEFAULT_VAULT } } }
+      : url.endsWith('/state')
+        ? { data: { chain_id: 1, address: DEFAULT_VAULT, last_indexed_block: '26163970', withdrawable_assets: '100' } }
+        : { data: { chain_id: 1, address: DEFAULT_VAULT, version: '1.1' } }), { status: 200 })));
+    const { provenance } = await fetchMorphoVault();
+    expect(provenance.vaultAccountingVersion).toBe('1.1');
+    expect(provenance.vaultVersionEndpoint).toMatch(/\/v0\/vaults-v1\/1:/);
+  });
   it('keeps the independently indexed REST block separate from GraphQL allocation provenance', async () => {
     vi.stubGlobal('fetch', vi.fn(async (url) => new Response(JSON.stringify(url.endsWith('/graphql')
       ? { data: { vaultByAddress: { address: DEFAULT_VAULT } } }

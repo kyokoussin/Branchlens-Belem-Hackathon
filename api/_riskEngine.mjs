@@ -67,6 +67,7 @@ export function normalizeVault(raw, provenance) {
   const withdrawableAssetsTokens = restWithdrawable == null ? null : D(restWithdrawable).div(D(10).pow(asset.decimals)).toString();
   return {
     version: 'MORPHO_V1', chainId: raw.chain.id, address: raw.address.toLowerCase(), name: raw.name || 'Unnamed Morpho vault',
+    accountingVersion: ['1.0', '1.1'].includes(provenance.vaultAccountingVersion) ? provenance.vaultAccountingVersion : null,
     asset: { address: addr(asset.address), symbol: asset.symbol || 'Unknown', decimals: asset.decimals },
     totalUsd: D(total).toString(), liquidityUsd, withdrawableAssetsTokens,
     allocations, knownAllocatedUsd: known.toString(), unquantifiedVaultUsd: unquantified.toString(),
@@ -98,6 +99,7 @@ export function normalizeMarket(raw, provenance) {
   };
   return {
     version: 'MORPHO_MARKET', chainId: raw.chain.id, address: allocation.marketId,
+    accountingVersion: null,
     name: `Morpho ${allocation.collateral.symbol}/${allocation.loan.symbol}`,
     asset: { address: allocation.loan.address, symbol: allocation.loan.symbol, decimals: loan.decimals },
     totalUsd: D(total).toString(), liquidityUsd: allocation.marketLiquidityUsd, withdrawableAssetsTokens: null,

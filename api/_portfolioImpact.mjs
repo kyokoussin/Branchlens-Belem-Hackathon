@@ -3,6 +3,20 @@ import { unionExposure } from './_riskEngine.mjs';
 
 const money = (value) => new Decimal(value).toDecimalPlaces(2).toFixed(2);
 
+function whyAffected(selected, position, marketCount) {
+  const subject = position.analysis.vault.version === 'MORPHO_MARKET' ? 'The tracked Morpho market' : 'The tracked Morpho vault';
+  if (selected.type === 'Blockchain') return `${subject} settles on ${selected.label}. A chain outage can interrupt access without implying a permanent loss.`;
+  if (selected.type === 'LendingMarket') return position.positionType === 'borrow'
+    ? 'The simulated borrower uses this verified market; tracked collateral and debt are not lender principal or a lender-loss estimate.'
+    : `${subject} supplies this verified market. Only its allocated share of the assumed position is counted.`;
+  if (selected.type === 'Oracle' || selected.type === 'OracleFeed' || selected.type === 'OracleVault') return `${marketCount} funded market${marketCount === 1 ? '' : 's'} depend on this pricing component. A bad price alone does not establish lender loss.`;
+  if (selected.type === 'CollateralToken') return `${marketCount} funded market${marketCount === 1 ? '' : 's'} accept ${selected.label} as collateral. Collateral stress does not itself establish bad debt.`;
+  if (selected.type === 'Vault') return 'The simulated position holds this vault; its underlying allocations determine market-specific exposure.';
+  if (selected.type === 'Position') return 'This is the analyst-entered simulated holding, not an observed wallet balance.';
+  if (selected.type === 'IssuerCustodian' || selected.type === 'BackingAsset') return `The path continues through a documented backing or custody claim for collateral in ${marketCount} funded market${marketCount === 1 ? '' : 's'}; economic loss is not verified.`;
+  return `${subject} has a graph path to this dependency through ${marketCount} funded market${marketCount === 1 ? '' : 's'}.`;
+}
+
 // Keep one graph: these are the verified per-position graph nodes and edges,
 // with only the assumed holding node made unique for each tracked position.
 export function mergePortfolioGraph(positions) {
@@ -74,7 +88,7 @@ export function buildImpactIndex(positions) {
       const exposedPrincipalUsd = vaultWide ? position.amountUsd : unionExposure(position.analysis.exposure, [...marketIds]);
       affectedPositions.push({
         id: position.id, name: position.name || position.analysis.vault.name, assumedPrincipalUsd: position.amountUsd,
-        exposedPrincipalUsd, marketIds: [...marketIds], paths,
+        exposedPrincipalUsd, marketIds: [...marketIds], paths, reason: whyAffected(selected, position, marketIds.size),
         dataMode: position.dataMode, retrievedAt: position.analysis.vault.provenance.retrievedAt,
         snapshotCapturedAt: position.snapshotCapturedAt,
       });
@@ -85,8 +99,10 @@ export function buildImpactIndex(positions) {
       selectedNodeId: selected.id, selectedLabel: selected.label, selectedType: selected.type,
       affectedPositions, affectedPositionCount: affectedPositions.length,
       affectedMarketCount: affectedMarketIds.size, affectedAllocationCount: affectedPositions.reduce((sum, position) => sum + position.marketIds.length, 0), affectedMarketIds: [...affectedMarketIds],
-      uniqueCapitalExposedUsd, maximumConditionalPrincipalLossUsd: uniqueCapitalExposedUsd,
-      maximumLossMeaning: 'Conditional bound if all exposed assumed principal is lost; not a predicted or observed loss.',
+      uniqueCapitalExposedUsd,
+      estimatedFinancialLossUsd: null,
+      temporarilyInaccessibleCapitalUsd: null,
+      estimationNote: 'A dependency path and allocated capital do not establish an incident, permanent loss, or withdrawal blockage.',
       sources: [...new Set(relevantEdges.map((edge) => edge.evidence?.source).filter(Boolean))],
       evidenceStatuses: [...new Set(relevantEdges.map((edge) => edge.status))],
     };

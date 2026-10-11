@@ -148,6 +148,9 @@ footer { margin: 20px 0 0; text-align: center; }
 .impact-summary small { display: block; color: #647487; font-size: 10px; }
 .impact-summary strong { display: block; margin-top: 4px; color: #20394e; font-size: 22px; }
 .impact-summary .wide:last-child { background: #fff8ee; border-color: #e8d3b2; }
+.impact-scenario-control { display: block; margin-top: 13px; color: #385467; font-size: 11px; font-weight: 700; }
+.impact-scenario-control select, .impact-scenario-control input { display: block; width: 100%; margin-top: 6px; padding: 9px 10px; border: 1px solid #c5d8dc; border-radius: 6px; background: #fff; color: #182a3b; font: inherit; }
+.impact-reason { margin: 5px 4px; color: #486174; font-size: 11px; line-height: 1.45; }
 .impact-position { margin: 9px 0; border: 1px solid #d7e1e8; border-radius: 6px; padding: 8px; }
 .impact-position.focused { border-color: #527f9d; background: #f4f8fb; }
 .impact-position-button { display: flex; width: 100%; justify-content: space-between; gap: 8px; align-items: baseline; text-align: left; border: 0; background: transparent; padding: 5px; }

@@ -1,9 +1,10 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { layoutGraph } from './graphLayout';
 import { calculateGraphShares } from './graphShares';
+import { evaluateImpactScenario } from '../api/_impactModel.mjs';
 import type { Graph, Impact, PortfolioData, Position } from './model';
 
-const money = (value: string | null | undefined) => value == null ? 'Not verified' : new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(Number(value));
+const money = (value: string | null | undefined) => value == null ? 'Insufficient data' : new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(Number(value));
 const short = (value: string) => value.length > 24 ? `${value.slice(0, 10)}…${value.slice(-6)}` : value;
 const mechanisms: Record<string, string> = {
   Position: 'Its risk comes from the verified vault or market and the dependencies beneath it.', Vault: 'Allocation changes, smart-contract failure, or withdrawal constraints could affect this position.',
@@ -21,6 +22,13 @@ const mechanisms: Record<string, string> = {
 export function GraphExplorer({ position, portfolio, view, selectedId, onSelect, onViewImpact, onReview, global = false }: { position: Position; portfolio: PortfolioData; view: 'dependency' | 'impact'; selectedId: string; onSelect: (id: string) => void; onViewImpact: (id: string) => void; onReview: () => void; global?: boolean }) {
   const analysis = position.analysis;
   const impact: Impact | null = view === 'impact' || global ? portfolio.impactIndex[selectedId] || null : null;
+  const [impactCase, setImpactCase] = useState('DEPENDENCY_ONLY');
+  const [marketLossPercent, setMarketLossPercent] = useState('');
+  useEffect(() => {
+    setImpactCase(portfolio.portfolioIncident?.dependencyNodeId === selectedId ? 'COLLATERAL_SHOCK' : 'DEPENDENCY_ONLY');
+    setMarketLossPercent('');
+  }, [selectedId, portfolio.portfolioIncident?.dependencyNodeId]);
+  const impactModel = useMemo(() => impact ? evaluateImpactScenario(impact, portfolio.positions, { type: impactCase, marketLossPercent }) : null, [impact, portfolio.positions, impactCase, marketLossPercent]);
   // This is viewport history only. Exposure always comes from the selected node's impact.
   const [visibleImpactSelections, setVisibleImpactSelections] = useState<string[]>([]);
   useEffect(() => {
@@ -128,10 +136,13 @@ export function GraphExplorer({ position, portfolio, view, selectedId, onSelect,
       <h2>{impact.selectedLabel}</h2>
       <div className="inspector-sub"><span className="type-pill">{impact.selectedType.replace(/([a-z])([A-Z])/g, '$1 $2')}</span><span>{impact.evidenceStatuses.join(' / ') || 'ASSUMED'}</span></div>
       <p>{portfolio.portfolioIncident?.dependencyNodeId === selectedId ? portfolio.portfolioIncident.whatHappened : 'If this dependency fails, these tracked investments have a verified path to it. No failure has been detected here.'}</p>
-      <div className="impact-summary" aria-label="Portfolio impact summary"><div><small>Affected positions</small><strong>{impact.affectedPositionCount}</strong></div><div><small>Distinct affected markets</small><strong>{impact.affectedMarketCount}</strong><small>{impact.affectedAllocationCount} funded allocations across positions</small></div><div className="wide"><small>Unique assumed principal exposed</small><strong>{money(impact.uniqueCapitalExposedUsd)}</strong></div><div className="wide"><small>Conditional maximum principal loss</small><strong>{money(impact.maximumConditionalPrincipalLossUsd)}</strong></div></div>
-      <p className="smallnote">{impact.maximumLossMeaning} Allocation weights come from verified Morpho vault allocations or direct market supply; repeated paths to a market count once per position.</p>
-      <div className="inspect-list"><h3>Impacted investments and complete paths</h3>{impact.affectedPositions.length ? impact.affectedPositions.map((item) => <div className={`impact-position ${focusedPositionId === item.id ? 'focused' : ''}`} key={item.id}>
+      <label className="impact-scenario-control">Incident to assess<select value={impactCase} onChange={(event) => setImpactCase(event.target.value)}><option value="DEPENDENCY_ONLY">Dependency reach only</option>{impact.selectedType === 'Blockchain' && <option value="CHAIN_OUTAGE">Complete chain outage · simulated</option>}{['Oracle', 'OracleFeed', 'OracleVault'].includes(impact.selectedType) && <option value="ORACLE_FAILURE">Oracle failure · simulated</option>}{['Vault', 'LendingMarket', 'LoanToken'].includes(impact.selectedType) && <option value="LIQUIDITY_STRESS">Liquidity stress · simulated</option>}{impact.selectedType === 'CollateralToken' && <option value="COLLATERAL_SHOCK">Collateral price shock · simulated</option>}{impact.selectedType === 'LendingMarket' && <option value="MARKET_BAD_DEBT">Market lender loss · assumed rate</option>}</select></label>
+      {impactCase === 'MARKET_BAD_DEBT' && <label className="impact-scenario-control">Hypothetical realized lender loss in this market (%)<input type="number" min="0.0001" max="100" step="0.01" inputMode="decimal" value={marketLossPercent} onChange={(event) => setMarketLossPercent(event.target.value)} placeholder="Enter a rate; not live bad debt" /></label>}
+      <div className="impact-summary" aria-label="Portfolio impact summary"><div><small>Affected positions</small><strong>{impact.affectedPositionCount}</strong></div><div><small>Distinct affected markets</small><strong>{impact.affectedMarketCount}</strong><small>{impact.affectedAllocationCount} funded allocations across positions</small></div><div className="wide"><small>Affected capital · unique simulated principal</small><strong>{money(impact.uniqueCapitalExposedUsd)}</strong></div><div className="wide"><small>Estimated financial loss</small><strong>{money(impactModel?.estimatedFinancialLossUsd)}</strong></div><div className="wide"><small>Temporarily inaccessible capital</small><strong>{money(impactModel?.temporarilyInaccessibleCapitalUsd)}</strong></div></div>
+      <p className="smallnote">{impactModel?.note} Real Morpho allocation weights determine the capital linked to each market. Shared paths are counted once per position.</p>
+      <div className="inspect-list"><h3>Impacted investments and complete paths</h3>{impactModel?.affectedPositions.length ? impactModel.affectedPositions.map((item) => <div className={`impact-position ${focusedPositionId === item.id ? 'focused' : ''}`} key={item.id}>
         <button className="impact-position-button" onClick={() => setFocusedPositionId(item.id)} aria-pressed={focusedPositionId === item.id}><strong>{item.name}</strong><span>{money(item.exposedPrincipalUsd)} exposed · {item.marketIds.length} market{item.marketIds.length === 1 ? '' : 's'}</span></button>
+        <p className="impact-reason">{item.explanation}</p>{impactCase === 'MARKET_BAD_DEBT' && <p className="impact-reason">Estimated financial loss: {money(item.estimatedFinancialLossUsd)} · Vault accounting: {portfolio.positions.find((position) => position.id === item.id)?.analysis.vault.accountingVersion || 'unverified'}{portfolio.positions.find((position) => position.id === item.id)?.analysis.vault.provenance.vaultVersionEndpoint && <> · <a href={portfolio.positions.find((position) => position.id === item.id)?.analysis.vault.provenance.vaultVersionEndpoint || '#'} target="_blank" rel="noopener noreferrer">Verify version ↗</a></>}</p>}{impactCase === 'CHAIN_OUTAGE' && <p className="impact-reason">Temporarily inaccessible: {money(item.temporarilyInaccessibleCapitalUsd)}</p>}
         <div className="impact-paths">{item.paths.map((path, index) => <p key={`${item.id}-${index}`} title={path.nodeIds.join(' → ')}><span className="path-index">Path {index + 1}</span>{path.nodeIds.map((id) => graphLabels.get(id) || id).join(' → ')}</p>)}</div>
         <small>{item.dataMode === 'LIVE_API' ? 'Live API retrieved' : 'Historical snapshot retrieved'} {new Date(item.retrievedAt).toLocaleString()}{item.snapshotCapturedAt ? ` · snapshot saved ${new Date(item.snapshotCapturedAt).toLocaleString()}` : ''}</small>
       </div>) : <p>No tracked position reaches this component in the current graph.</p>}</div>

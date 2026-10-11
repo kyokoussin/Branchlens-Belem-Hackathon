@@ -124,8 +124,10 @@ export async function fetchMorphoVault(address = DEFAULT_VAULT, chainId = 1) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 12000);
   const restEndpoint = `${REST_BASE}/${chainId}:${address}/state`;
+  const configEndpoint = `${REST_BASE}/${chainId}:${address}`;
   let result;
   let restState = null;
+  let vaultAccountingVersion = null;
   let restStateNote = 'REST vault state unavailable; no indexed block or withdrawable token amount was substituted.';
   try {
     const graphRequest = fetch(API, {
@@ -135,9 +137,16 @@ export async function fetchMorphoVault(address = DEFAULT_VAULT, chainId = 1) {
       signal: controller.signal,
     });
     const restRequest = fetch(restEndpoint, { headers: { accept: 'application/json' }, signal: controller.signal });
-    const [response, restResponse] = await Promise.all([graphRequest, restRequest.catch(() => null)]);
+    const configRequest = fetch(configEndpoint, { headers: { accept: 'application/json' }, signal: controller.signal });
+    const [response, restResponse, configResponse] = await Promise.all([graphRequest, restRequest.catch(() => null), configRequest.catch(() => null)]);
     if (!response.ok) throw new SourceError(`Morpho API returned HTTP ${response.status}.`, response.status === 429 ? 'RATE_LIMITED' : 'SOURCE_UNAVAILABLE');
     result = await response.json();
+    if (configResponse?.ok) {
+      try {
+        const candidate = (await configResponse.json()).data;
+        if (candidate?.chain_id === chainId && candidate.address?.toLowerCase() === address.toLowerCase() && ['1.0', '1.1'].includes(candidate.version)) vaultAccountingVersion = candidate.version;
+      } catch { /* Version remains unknown rather than inferred from an address. */ }
+    }
     if (restResponse?.ok) {
       let candidate = null;
       try { candidate = (await restResponse.json()).data; } catch { /* Optional REST source remains UNKNOWN. */ }
@@ -171,6 +180,8 @@ export async function fetchMorphoVault(address = DEFAULT_VAULT, chainId = 1) {
       sourceTimestamp: null,
       restState,
       restStateNote,
+      vaultAccountingVersion,
+      vaultVersionEndpoint: vaultAccountingVersion ? configEndpoint : null,
       note: 'The selected GraphQL response does not expose an indexed block or market update timestamp. Retrieval time is not blockchain time.',
     },
   };

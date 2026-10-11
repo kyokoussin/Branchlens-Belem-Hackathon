@@ -21,7 +21,8 @@ describe('reverse portfolio impact', () => {
     for (const item of impact.affectedPositions) for (const marketId of item.marketIds) positionsByMarket.set(marketId, new Set([...(positionsByMarket.get(marketId) || []), item.id]));
     expect([...positionsByMarket.values()].some((positionIds) => positionIds.size >= 3)).toBe(true);
     expect(portfolio.portfolioGraph.nodes.filter((node) => node.id === cbBtcId)).toHaveLength(1);
-    expect(impact.maximumConditionalPrincipalLossUsd).toBe(impact.uniqueCapitalExposedUsd);
+    expect(impact.estimatedFinancialLossUsd).toBeNull();
+    expect(impact.temporarilyInaccessibleCapitalUsd).toBeNull();
     expect(portfolio.portfolioIncident.uniqueCapitalExposedUsd).toBe(impact.uniqueCapitalExposedUsd);
     for (const item of impact.affectedPositions) for (const path of item.paths) {
       expect(path.nodeIds[0]).toBe(`position:tracked:${item.id}`);
