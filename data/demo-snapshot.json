@@ -1,6 +1,6 @@
 {
   "kind": "VERIFIED_HISTORICAL_MORPHO_API_SNAPSHOT",
-  "capturedAt": "2026-10-10T21:53:53.800Z",
+  "capturedAt": "2026-10-10T23:49:59.998Z",
   "source": "https://api.morpho.org/graphql",
   "positions": [
     {
@@ -18,10 +18,10 @@
           "decimals": 6
         },
         "state": {
-          "totalAssetsUsd": 65300310.953275084,
+          "totalAssetsUsd": 65300707.650424466,
           "allocation": [
             {
-              "supplyAssetsUsd": 10433004.09229575,
+              "supplyAssetsUsd": 10495797.309827562,
               "market": {
                 "marketId": "0x85252bb8485c99bba46fe149c7dd2aad83672640f53c630890673cf1848ba16e",
                 "lltv": "860000000000000000",
@@ -55,15 +55,15 @@
                   "decimals": 18
                 },
                 "state": {
-                  "supplyAssetsUsd": 43798238.75772069,
-                  "borrowAssetsUsd": 39486103.19630635,
-                  "liquidityAssetsUsd": 4312135.561414344,
-                  "utilization": 0.9015454574493773
+                  "supplyAssetsUsd": 43557887.714921616,
+                  "borrowAssetsUsd": 39486401.58883193,
+                  "liquidityAssetsUsd": 4071486.126089678,
+                  "utilization": 0.9065270071694751
                 }
               }
             },
             {
-              "supplyAssetsUsd": 49.101306085149226,
+              "supplyAssetsUsd": 49.18316844684206,
               "market": {
                 "marketId": "0xfb8d92086861bae6fb778917afd1de5dbbc4ec70edfb636fed48238e225e7e3d",
                 "lltv": "860000000000000000",
@@ -84,15 +84,15 @@
                   "decimals": 18
                 },
                 "state": {
-                  "supplyAssetsUsd": 56.804604733019,
-                  "borrowAssetsUsd": 51.21739970454451,
-                  "liquidityAssetsUsd": 5.5872050284744885,
-                  "utilization": 0.9016416881213365
+                  "supplyAssetsUsd": 56.4921073628084,
+                  "borrowAssetsUsd": 51.2177852603487,
+                  "liquidityAssetsUsd": 5.274322102459691,
+                  "utilization": 0.9066361240768291
                 }
               }
             },
             {
-              "supplyAssetsUsd": 11125867.860453626,
+              "supplyAssetsUsd": 10516925.621513164,
               "market": {
                 "marketId": "0x3a85e619751152991742810df6ec69ce473daef99e28a64ab2340d7b7ccfee49",
                 "lltv": "860000000000000000",
@@ -125,15 +125,15 @@
                   "decimals": 8
                 },
                 "state": {
-                  "supplyAssetsUsd": 128840443.54282491,
-                  "borrowAssetsUsd": 116077678.23606463,
-                  "liquidityAssetsUsd": 12762765.306760293,
-                  "utilization": 0.9009413119373645
+                  "supplyAssetsUsd": 129244503.09845212,
+                  "borrowAssetsUsd": 116078602.10830359,
+                  "liquidityAssetsUsd": 13165900.990148524,
+                  "utilization": 0.8981318301783451
                 }
               }
             },
             {
-              "supplyAssetsUsd": 1313168.2425104857,
+              "supplyAssetsUsd": 1271412.9817053983,
               "market": {
                 "marketId": "0x7e585a933ffe8443c371b4f8cfeb4430f5f6a14c2f32a898c26662c67a1cb8b8",
                 "lltv": "860000000000000000",
@@ -165,15 +165,15 @@
                   "decimals": 18
                 },
                 "state": {
-                  "supplyAssetsUsd": 12555792.861224953,
-                  "borrowAssetsUsd": 11322026.06933633,
-                  "liquidityAssetsUsd": 1233766.7918886207,
-                  "utilization": 0.9017372454670892
+                  "supplyAssetsUsd": 12547430.60431771,
+                  "borrowAssetsUsd": 11316213.896346625,
+                  "liquidityAssetsUsd": 1231216.707971083,
+                  "utilization": 0.9018749936303766
                 }
               }
             },
             {
-              "supplyAssetsUsd": 165228.4137061977,
+              "supplyAssetsUsd": 164454.34242522714,
               "market": {
                 "marketId": "0x09dc9e7eb5d8fc54b2bc41d1135fd4e99057a580f680321faeb90c7a21e631c1",
                 "lltv": "860000000000000000",
@@ -194,15 +194,15 @@
                   "decimals": 8
                 },
                 "state": {
-                  "supplyAssetsUsd": 1507120.567775007,
-                  "borrowAssetsUsd": 1359333.8045305132,
-                  "liquidityAssetsUsd": 147786.76324449404,
-                  "utilization": 0.9019409817605537
+                  "supplyAssetsUsd": 1506919.4941640366,
+                  "borrowAssetsUsd": 1359343.993397953,
+                  "liquidityAssetsUsd": 147575.5007660839,
+                  "utilization": 0.9020680923316667
                 }
               }
             },
             {
-              "supplyAssetsUsd": 5431.684490394484,
+              "supplyAssetsUsd": 0,
               "market": {
                 "marketId": "0xbc99de6a88904cd0e69042ad6f266e63182801f030c636507c3caf590ffd84fe",
                 "lltv": "860000000000000000",
@@ -223,15 +223,15 @@
                   "decimals": 8
                 },
                 "state": {
-                  "supplyAssetsUsd": 1053315.7916663059,
-                  "borrowAssetsUsd": 954366.4791575237,
-                  "liquidityAssetsUsd": 98949.31250878201,
-                  "utilization": 0.9060592148227001
+                  "supplyAssetsUsd": 1052163.4940310048,
+                  "borrowAssetsUsd": 954373.354858191,
+                  "liquidityAssetsUsd": 97790.13917281386,
+                  "utilization": 0.9070580382919727
                 }
               }
             },
             {
-              "supplyAssetsUsd": 19522.623761848736,
+              "supplyAssetsUsd": 0,
               "market": {
                 "marketId": "0x94b823e6bd8ea533b4e33fbc307faea0b307301bc48763acc4d4aa4def7636cd",
                 "lltv": "860000000000000000",
@@ -261,15 +261,15 @@
                   "decimals": 18
                 },
                 "state": {
-                  "supplyAssetsUsd": 9286119.857011644,
-                  "borrowAssetsUsd": 8361964.57632002,
-                  "liquidityAssetsUsd": 924155.2806916244,
-                  "utilization": 0.90047993188524
+                  "supplyAssetsUsd": 9266592.44407424,
+                  "borrowAssetsUsd": 8362024.9343662625,
+                  "liquidityAssetsUsd": 904567.5097079762,
+                  "utilization": 0.9023840192425399
                 }
               }
             },
             {
-              "supplyAssetsUsd": 11802138.271171201,
+              "supplyAssetsUsd": 11819342.468963152,
               "market": {
                 "marketId": "0xc498f4bfdda99e60ea8eb04c1e145654a70bc59da76ef9c6ed54a1314d78e5b5",
                 "lltv": "915000000000000000",
@@ -301,10 +301,10 @@
                   "decimals": 18
                 },
                 "state": {
-                  "supplyAssetsUsd": 11961346.19968548,
-                  "borrowAssetsUsd": 10783762.44642795,
-                  "liquidityAssetsUsd": 1177583.753257531,
-                  "utilization": 0.9015509012448368
+                  "supplyAssetsUsd": 11905298.007564886,
+                  "borrowAssetsUsd": 10783836.788588615,
+                  "liquidityAssetsUsd": 1121461.2189762695,
+                  "utilization": 0.9058014996127213
                 }
               }
             },
@@ -322,15 +322,15 @@
                 },
                 "collateralAsset": null,
                 "state": {
-                  "supplyAssetsUsd": 639860.4861045737,
+                  "supplyAssetsUsd": 639857.571940873,
                   "borrowAssetsUsd": 0,
-                  "liquidityAssetsUsd": 639860.4861045737,
+                  "liquidityAssetsUsd": 639857.571940873,
                   "utilization": 0
                 }
               }
             },
             {
-              "supplyAssetsUsd": 27195102.6681184,
+              "supplyAssetsUsd": 27948780.37633852,
               "market": {
                 "marketId": "0x64d65c9a2d91c36d56fbc42d69e979335320169b3df63bf92789e2c8883fcc64",
                 "lltv": "860000000000000000",
@@ -360,15 +360,15 @@
                   "decimals": 8
                 },
                 "state": {
-                  "supplyAssetsUsd": 337136280.58267444,
-                  "borrowAssetsUsd": 303895422.73802805,
-                  "liquidityAssetsUsd": 33240857.844646364,
-                  "utilization": 0.9014023118864691
+                  "supplyAssetsUsd": 337147199.6331395,
+                  "borrowAssetsUsd": 303897731.6774507,
+                  "liquidityAssetsUsd": 33249467.95568878,
+                  "utilization": 0.9013799669940353
                 }
               }
             },
             {
-              "supplyAssetsUsd": 3199515.6733164224,
+              "supplyAssetsUsd": 3041535.0957442685,
               "market": {
                 "marketId": "0xb323495f7e4148be5643a4ea4a8221eef163e4bccfdedc2a6f4696baacbc86cc",
                 "lltv": "860000000000000000",
@@ -399,15 +399,15 @@
                   "decimals": 18
                 },
                 "state": {
-                  "supplyAssetsUsd": 32667639.174125783,
-                  "borrowAssetsUsd": 29374529.266393647,
-                  "liquidityAssetsUsd": 3293109.907732135,
-                  "utilization": 0.899193514101857
+                  "supplyAssetsUsd": 32588933.76072781,
+                  "borrowAssetsUsd": 29374712.456421267,
+                  "liquidityAssetsUsd": 3214221.3043065453,
+                  "utilization": 0.9013707742663268
                 }
               }
             },
             {
-              "supplyAssetsUsd": 41282.322144672034,
+              "supplyAssetsUsd": 42410.27073873148,
               "market": {
                 "marketId": "0x34377fc4f617c51818e92c79df31ff270c6a91bc94ad32e367fdf59b9f4ac5dd",
                 "lltv": "770000000000000000",
@@ -441,32 +441,32 @@
                   "decimals": 18
                 },
                 "state": {
-                  "supplyAssetsUsd": 422458.9794659316,
-                  "borrowAssetsUsd": 383848.0689803243,
-                  "liquidityAssetsUsd": 38610.9104856073,
-                  "utilization": 0.9086043560148281
+                  "supplyAssetsUsd": 423267.72042106715,
+                  "borrowAssetsUsd": 383851.1354163936,
+                  "liquidityAssetsUsd": 39416.585004673565,
+                  "utilization": 0.9068755232138612
                 }
               }
             }
           ]
         },
         "liquidity": {
-          "usd": 48455329.87763632,
-          "underlying": 48469283767933
+          "usd": 48118402.50672584,
+          "underlying": 48132478583884
         }
       },
       "provenance": {
         "endpoint": "https://api.morpho.org/graphql",
         "queryName": "VaultRiskSnapshot",
-        "retrievedAt": "2026-10-10T21:53:53.481Z",
+        "retrievedAt": "2026-10-10T23:49:59.288Z",
         "indexedBlock": null,
         "sourceTimestamp": null,
         "restState": {
           "endpoint": "https://api.morpho.org/v0/vaults-v1/1:0xBEEF01735c132Ada46AA9aA4c54623cAA92A64CB/state",
-          "retrievedAt": "2026-10-10T21:53:53.480Z",
-          "indexedBlock": "26164852",
-          "withdrawableAssetsRaw": "48469307792962",
-          "totalAssetsRaw": "65319153856143"
+          "retrievedAt": "2026-10-10T23:49:59.287Z",
+          "indexedBlock": "26165430",
+          "withdrawableAssetsRaw": "48132488301786",
+          "totalAssetsRaw": "65319826280747"
         },
         "restStateNote": "REST vault state is independently indexed; its block does not timestamp the GraphQL USD allocations.",
         "note": "The selected GraphQL response does not expose an indexed block or market update timestamp. Retrieval time is not blockchain time."
@@ -487,7 +487,7 @@
           "decimals": 6
         },
         "state": {
-          "totalAssetsUsd": 3540655.6245215903,
+          "totalAssetsUsd": 3540676.2084635105,
           "allocation": [
             {
               "supplyAssetsUsd": 0,
@@ -520,15 +520,15 @@
                   "decimals": 18
                 },
                 "state": {
-                  "supplyAssetsUsd": 8030802.713696654,
-                  "borrowAssetsUsd": 6722029.92305294,
-                  "liquidityAssetsUsd": 1308772.7906437141,
-                  "utilization": 0.8370308875336232
+                  "supplyAssetsUsd": 7425149.200704626,
+                  "borrowAssetsUsd": 6722108.342309685,
+                  "liquidityAssetsUsd": 703040.8583949406,
+                  "utilization": 0.9053162651158277
                 }
               }
             },
             {
-              "supplyAssetsUsd": 28.08705864860236,
+              "supplyAssetsUsd": 5525.793409553666,
               "market": {
                 "marketId": "0x61765602144e91e5ac9f9e98b8584eae308f9951596fd7f5e0f59f21cd2bf664",
                 "lltv": "860000000000000000",
@@ -558,15 +558,15 @@
                   "decimals": 18
                 },
                 "state": {
-                  "supplyAssetsUsd": 784431.7415747077,
-                  "borrowAssetsUsd": 707579.3031088201,
-                  "liquidityAssetsUsd": 76852.43846588755,
-                  "utilization": 0.9020278828702035
+                  "supplyAssetsUsd": 786196.3332773648,
+                  "borrowAssetsUsd": 707587.3314261023,
+                  "liquidityAssetsUsd": 78609.00185126248,
+                  "utilization": 0.9000135226736936
                 }
               }
             },
             {
-              "supplyAssetsUsd": 622.1131473942332,
+              "supplyAssetsUsd": 2872.2577233960724,
               "market": {
                 "marketId": "0x34377fc4f617c51818e92c79df31ff270c6a91bc94ad32e367fdf59b9f4ac5dd",
                 "lltv": "770000000000000000",
@@ -600,15 +600,15 @@
                   "decimals": 18
                 },
                 "state": {
-                  "supplyAssetsUsd": 422458.9794659316,
-                  "borrowAssetsUsd": 383848.0689803243,
-                  "liquidityAssetsUsd": 38610.9104856073,
-                  "utilization": 0.9086043560148281
+                  "supplyAssetsUsd": 423267.72042106715,
+                  "borrowAssetsUsd": 383851.1354163936,
+                  "liquidityAssetsUsd": 39416.585004673565,
+                  "utilization": 0.9068755232138612
                 }
               }
             },
             {
-              "supplyAssetsUsd": 796465.3000669769,
+              "supplyAssetsUsd": 476088.2463766512,
               "market": {
                 "marketId": "0x64d65c9a2d91c36d56fbc42d69e979335320169b3df63bf92789e2c8883fcc64",
                 "lltv": "860000000000000000",
@@ -638,10 +638,10 @@
                   "decimals": 8
                 },
                 "state": {
-                  "supplyAssetsUsd": 337136280.58267444,
-                  "borrowAssetsUsd": 303895422.73802805,
-                  "liquidityAssetsUsd": 33240857.844646364,
-                  "utilization": 0.9014023118864691
+                  "supplyAssetsUsd": 337147199.6331395,
+                  "borrowAssetsUsd": 303897731.6774507,
+                  "liquidityAssetsUsd": 33249467.95568878,
+                  "utilization": 0.9013799669940353
                 }
               }
             },
@@ -659,15 +659,15 @@
                 },
                 "collateralAsset": null,
                 "state": {
-                  "supplyAssetsUsd": 639860.4861045737,
+                  "supplyAssetsUsd": 639857.571940873,
                   "borrowAssetsUsd": 0,
-                  "liquidityAssetsUsd": 639860.4861045737,
+                  "liquidityAssetsUsd": 639857.571940873,
                   "utilization": 0
                 }
               }
             },
             {
-              "supplyAssetsUsd": 1675497.0577001206,
+              "supplyAssetsUsd": 1981980.661008282,
               "market": {
                 "marketId": "0x3a85e619751152991742810df6ec69ce473daef99e28a64ab2340d7b7ccfee49",
                 "lltv": "860000000000000000",
@@ -700,15 +700,15 @@
                   "decimals": 8
                 },
                 "state": {
-                  "supplyAssetsUsd": 128840443.54282491,
-                  "borrowAssetsUsd": 116077678.23606463,
-                  "liquidityAssetsUsd": 12762765.306760293,
-                  "utilization": 0.9009413119373645
+                  "supplyAssetsUsd": 129244503.09845212,
+                  "borrowAssetsUsd": 116078602.10830359,
+                  "liquidityAssetsUsd": 13165900.990148524,
+                  "utilization": 0.8981318301783451
                 }
               }
             },
             {
-              "supplyAssetsUsd": 548541.1750843606,
+              "supplyAssetsUsd": 554338.0996916415,
               "market": {
                 "marketId": "0xe4cfbee9af4ad713b41bf79f009ca02b17c001a0c0e7bd2e6a89b1111b3d3f08",
                 "lltv": "770000000000000000",
@@ -740,15 +740,15 @@
                   "decimals": 18
                 },
                 "state": {
-                  "supplyAssetsUsd": 549557.8802513893,
-                  "borrowAssetsUsd": 495283.0837055975,
-                  "liquidityAssetsUsd": 54274.796545791854,
-                  "utilization": 0.9012391624318726
+                  "supplyAssetsUsd": 555130.7089146511,
+                  "borrowAssetsUsd": 495288.5837516106,
+                  "liquidityAssetsUsd": 59842.125163040524,
+                  "utilization": 0.8922017387940234
                 }
               }
             },
             {
-              "supplyAssetsUsd": 499958.2717855255,
+              "supplyAssetsUsd": 499961.80839812005,
               "market": {
                 "marketId": "0xbf02d6c6852fa0b8247d5514d0c91e6c1fbde9a168ac3fd2033028b5ee5ce6d0",
                 "lltv": "860000000000000000",
@@ -780,15 +780,15 @@
                   "decimals": 8
                 },
                 "state": {
-                  "supplyAssetsUsd": 1940043.4520211562,
-                  "borrowAssetsUsd": 1727916.457369552,
-                  "liquidityAssetsUsd": 212126.99465160415,
-                  "utilization": 0.8906586373461851
+                  "supplyAssetsUsd": 1927736.7242240936,
+                  "borrowAssetsUsd": 1727938.7129449574,
+                  "liquidityAssetsUsd": 199798.0112791362,
+                  "utilization": 0.8963561731389673
                 }
               }
             },
             {
-              "supplyAssetsUsd": 19543.600211170167,
+              "supplyAssetsUsd": 19909.322388560522,
               "market": {
                 "marketId": "0x729badf297ee9f2f6b3f717b96fd355fc6ec00422284ce1968e76647b258cf44",
                 "lltv": "915000000000000000",
@@ -818,15 +818,15 @@
                   "decimals": 6
                 },
                 "state": {
-                  "supplyAssetsUsd": 26636.019464613422,
-                  "borrowAssetsUsd": 24140.43596955409,
-                  "liquidityAssetsUsd": 2495.583495059331,
-                  "utilization": 0.9063079414559382
+                  "supplyAssetsUsd": 26746.95364016645,
+                  "borrowAssetsUsd": 24140.72657181803,
+                  "liquidityAssetsUsd": 2606.2270683484194,
+                  "utilization": 0.9025598539777407
                 }
               }
             },
             {
-              "supplyAssetsUsd": 0.019467393890632918,
+              "supplyAssetsUsd": 0.019467305228848267,
               "market": {
                 "marketId": "0xeb17955ea422baeddbfb0b8d8c9086c5be7a9cfdefb292119a102e981a30062e",
                 "lltv": "915000000000000000",
@@ -860,8 +860,8 @@
                   "decimals": 18
                 },
                 "state": {
-                  "supplyAssetsUsd": 4.84919055768415,
-                  "borrowAssetsUsd": 4.84919055768415,
+                  "supplyAssetsUsd": 4.849192465640062,
+                  "borrowAssetsUsd": 4.849192465640062,
                   "liquidityAssetsUsd": 0,
                   "utilization": 1
                 }
@@ -902,32 +902,32 @@
                   "decimals": 18
                 },
                 "state": {
-                  "supplyAssetsUsd": 7990613.163389764,
-                  "borrowAssetsUsd": 7192567.802635677,
-                  "liquidityAssetsUsd": 798045.3607540872,
-                  "utilization": 0.9001271436326744
+                  "supplyAssetsUsd": 7997786.585374101,
+                  "borrowAssetsUsd": 7192649.663187553,
+                  "liquidityAssetsUsd": 805136.9221865475,
+                  "utilization": 0.8993300316791478
                 }
               }
             }
           ]
         },
         "liquidity": {
-          "usd": 2741509.932665596,
-          "underlying": 2742299417103
+          "usd": 2728713.3220284083,
+          "underlying": 2729511552586
         }
       },
       "provenance": {
         "endpoint": "https://api.morpho.org/graphql",
         "queryName": "VaultRiskSnapshot",
-        "retrievedAt": "2026-10-10T21:53:53.656Z",
+        "retrievedAt": "2026-10-10T23:49:59.381Z",
         "indexedBlock": null,
         "sourceTimestamp": null,
         "restState": {
           "endpoint": "https://api.morpho.org/v0/vaults-v1/1:0x8eB67A509616cd6A7c1B3c8C21D48FF57df3d458/state",
-          "retrievedAt": "2026-10-10T21:53:53.656Z",
-          "indexedBlock": "26164852",
-          "withdrawableAssetsRaw": "2742301183114",
-          "totalAssetsRaw": "3541677841923"
+          "retrievedAt": "2026-10-10T23:49:59.381Z",
+          "indexedBlock": "26165430",
+          "withdrawableAssetsRaw": "2729512526095",
+          "totalAssetsRaw": "3541713399843"
         },
         "restStateNote": "REST vault state is independently indexed; its block does not timestamp the GraphQL USD allocations.",
         "note": "The selected GraphQL response does not expose an indexed block or market update timestamp. Retrieval time is not blockchain time."
@@ -948,10 +948,10 @@
           "decimals": 18
         },
         "state": {
-          "totalAssetsUsd": 7849505.086451779,
+          "totalAssetsUsd": 7837756.98762147,
           "allocation": [
             {
-              "supplyAssetsUsd": 6591950.61066886,
+              "supplyAssetsUsd": 6582084.64492475,
               "market": {
                 "marketId": "0xb8fc70e82bc5bb53e773626fcc6a23f7eefa036918d7ef216ecfb1950a94a85e",
                 "lltv": "965000000000000000",
@@ -981,10 +981,10 @@
                   "decimals": 18
                 },
                 "state": {
-                  "supplyAssetsUsd": 87123230.37124023,
-                  "borrowAssetsUsd": 72730371.57208493,
-                  "liquidityAssetsUsd": 14392858.799155291,
-                  "utilization": 0.8347988390946253
+                  "supplyAssetsUsd": 86992708.95373455,
+                  "borrowAssetsUsd": 72621589.51339301,
+                  "liquidityAssetsUsd": 14371119.440341545,
+                  "utilization": 0.8348008745424337
                 }
               }
             },
@@ -1002,15 +1002,15 @@
                 },
                 "collateralAsset": null,
                 "state": {
-                  "supplyAssetsUsd": 2060586.903512278,
+                  "supplyAssetsUsd": 2057496.051823791,
                   "borrowAssetsUsd": 0,
-                  "liquidityAssetsUsd": 2060586.9035122783,
+                  "liquidityAssetsUsd": 2057496.0518237911,
                   "utilization": 0
                 }
               }
             },
             {
-              "supplyAssetsUsd": 1047543.1848791728,
+              "supplyAssetsUsd": 1045975.3603088319,
               "market": {
                 "marketId": "0xd0e50cdac92fe2172043f5e0c36532c6369d24947e40968f34a5e8819ca9ec5d",
                 "lltv": "945000000000000000",
@@ -1040,15 +1040,15 @@
                   "decimals": 18
                 },
                 "state": {
-                  "supplyAssetsUsd": 23545656.222615637,
-                  "borrowAssetsUsd": 19942068.371702403,
-                  "liquidityAssetsUsd": 3603587.8509132327,
-                  "utilization": 0.8469531782489892
+                  "supplyAssetsUsd": 23510422.386790395,
+                  "borrowAssetsUsd": 19912239.8675206,
+                  "liquidityAssetsUsd": 3598182.5192697956,
+                  "utilization": 0.8469537271567066
                 }
               }
             },
             {
-              "supplyAssetsUsd": 6.937937137189646,
+              "supplyAssetsUsd": 6.927533836854951,
               "market": {
                 "marketId": "0x138eec0e4a1937eb92ebc70043ed539661dd7ed5a89fb92a720b341650288a40",
                 "lltv": "915000000000000000",
@@ -1078,10 +1078,10 @@
                   "decimals": 8
                 },
                 "state": {
-                  "supplyAssetsUsd": 195077.96637667512,
-                  "borrowAssetsUsd": 137765.01553694325,
-                  "liquidityAssetsUsd": 57312.95083973189,
-                  "utilization": 0.7062048989732311
+                  "supplyAssetsUsd": 194785.4588280284,
+                  "borrowAssetsUsd": 137558.4766172212,
+                  "liquidityAssetsUsd": 57226.98221080718,
+                  "utilization": 0.7062050598893443
                 }
               }
             },
@@ -1118,15 +1118,15 @@
                   "decimals": 8
                 },
                 "state": {
-                  "supplyAssetsUsd": 187559.01758958196,
-                  "borrowAssetsUsd": 57350.092664382646,
-                  "liquidityAssetsUsd": 130208.92492519933,
-                  "utilization": 0.30577091627701175
+                  "supplyAssetsUsd": 187277.68827235448,
+                  "borrowAssetsUsd": 57264.07492308295,
+                  "liquidityAssetsUsd": 130013.61334927153,
+                  "utilization": 0.30577094074231026
                 }
               }
             },
             {
-              "supplyAssetsUsd": 210004.35296660784,
+              "supplyAssetsUsd": 209690.0548540511,
               "market": {
                 "marketId": "0x37e7484d642d90f14451f1910ba4b7b8e4c3ccdd0ec28f8b2bdb35479e472ba7",
                 "lltv": "945000000000000000",
@@ -1156,32 +1156,1521 @@
                   "decimals": 18
                 },
                 "state": {
-                  "supplyAssetsUsd": 14863216.096740643,
-                  "borrowAssetsUsd": 12047827.99055618,
-                  "liquidityAssetsUsd": 2815388.106184464,
-                  "utilization": 0.8105801538603848
+                  "supplyAssetsUsd": 14840970.874979988,
+                  "borrowAssetsUsd": 12029805.811787266,
+                  "liquidityAssetsUsd": 2811165.0631927247,
+                  "utilization": 0.8105807843116251
                 }
               }
             }
           ]
         },
         "liquidity": {
-          "usd": 7849505.086451779,
-          "underlying": "3129441857795287446797"
+          "usd": 7837756.98762147,
+          "underlying": "3129452258854124742458"
         }
       },
       "provenance": {
         "endpoint": "https://api.morpho.org/graphql",
         "queryName": "VaultRiskSnapshot",
-        "retrievedAt": "2026-10-10T21:53:53.799Z",
+        "retrievedAt": "2026-10-10T23:49:59.509Z",
         "indexedBlock": null,
         "sourceTimestamp": null,
         "restState": {
           "endpoint": "https://api.morpho.org/v0/vaults-v1/1:0x2371e134e3455e0593363cBF89d3b6cf53740618/state",
-          "retrievedAt": "2026-10-10T21:53:53.799Z",
-          "indexedBlock": "26164852",
-          "withdrawableAssetsRaw": "3129444849284012533476",
-          "totalAssetsRaw": "3129444849284012533476"
+          "retrievedAt": "2026-10-10T23:49:59.509Z",
+          "indexedBlock": "26165430",
+          "withdrawableAssetsRaw": "3129455725706519102875",
+          "totalAssetsRaw": "3129455725706519102875"
+        },
+        "restStateNote": "REST vault state is independently indexed; its block does not timestamp the GraphQL USD allocations.",
+        "note": "The selected GraphQL response does not expose an indexed block or market update timestamp. Retrieval time is not blockchain time."
+      }
+    },
+    {
+      "id": "gauntlet-usdc-prime",
+      "address": "0xdd0f28e19C1780eb6396170735D45153D261490d",
+      "raw": {
+        "address": "0xdd0f28e19C1780eb6396170735D45153D261490d",
+        "name": "Gauntlet USDC Prime",
+        "chain": {
+          "id": 1
+        },
+        "asset": {
+          "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "symbol": "USDC",
+          "decimals": 6
+        },
+        "state": {
+          "totalAssetsUsd": 21995778.503481373,
+          "allocation": [
+            {
+              "supplyAssetsUsd": 290252.8230903962,
+              "market": {
+                "marketId": "0x09dc9e7eb5d8fc54b2bc41d1135fd4e99057a580f680321faeb90c7a21e631c1",
+                "lltv": "860000000000000000",
+                "irmAddress": "0x870aC11D48B15DB9a138Cf899d20F13F79Ba00BC",
+                "oracle": {
+                  "address": "0xf1561bC4b3D1bA49053986Fb9ee88D4fE22d0Cf4",
+                  "type": "Unknown",
+                  "data": null
+                },
+                "loanAsset": {
+                  "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                  "symbol": "USDC",
+                  "decimals": 6
+                },
+                "collateralAsset": {
+                  "address": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
+                  "symbol": "WBTC",
+                  "decimals": 8
+                },
+                "state": {
+                  "supplyAssetsUsd": 1506919.4941640366,
+                  "borrowAssetsUsd": 1359343.993397953,
+                  "liquidityAssetsUsd": 147575.5007660839,
+                  "utilization": 0.9020680923316667
+                }
+              }
+            },
+            {
+              "supplyAssetsUsd": 2044722.5622787653,
+              "market": {
+                "marketId": "0x7e585a933ffe8443c371b4f8cfeb4430f5f6a14c2f32a898c26662c67a1cb8b8",
+                "lltv": "860000000000000000",
+                "irmAddress": "0x870aC11D48B15DB9a138Cf899d20F13F79Ba00BC",
+                "oracle": {
+                  "address": "0xe087AD7FE989cF63F8383579D160a20Ee7e69F9F",
+                  "type": "ChainlinkOracleV2",
+                  "data": {
+                    "baseFeedOne": {
+                      "address": "0x4F67e4d9BD67eFa28236013288737D39AeF48e79"
+                    },
+                    "baseFeedTwo": {
+                      "address": "0xc0053f3FBcCD593758258334Dfce24C2A9A673aD"
+                    },
+                    "quoteFeedOne": null,
+                    "quoteFeedTwo": null,
+                    "baseOracleVault": null,
+                    "quoteOracleVault": null
+                  }
+                },
+                "loanAsset": {
+                  "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                  "symbol": "USDC",
+                  "decimals": 6
+                },
+                "collateralAsset": {
+                  "address": "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0",
+                  "symbol": "wstETH",
+                  "decimals": 18
+                },
+                "state": {
+                  "supplyAssetsUsd": 12547430.60431771,
+                  "borrowAssetsUsd": 11316213.896346625,
+                  "liquidityAssetsUsd": 1231216.707971083,
+                  "utilization": 0.9018749936303766
+                }
+              }
+            },
+            {
+              "supplyAssetsUsd": 4524744.614928716,
+              "market": {
+                "marketId": "0x94b823e6bd8ea533b4e33fbc307faea0b307301bc48763acc4d4aa4def7636cd",
+                "lltv": "860000000000000000",
+                "irmAddress": "0x870aC11D48B15DB9a138Cf899d20F13F79Ba00BC",
+                "oracle": {
+                  "address": "0x0F948CBa8231Db7898ef36A4212581Ad7b1B4580",
+                  "type": "ChainlinkOracleV2",
+                  "data": {
+                    "baseFeedOne": {
+                      "address": "0xc0053f3FBcCD593758258334Dfce24C2A9A673aD"
+                    },
+                    "baseFeedTwo": null,
+                    "quoteFeedOne": null,
+                    "quoteFeedTwo": null,
+                    "baseOracleVault": null,
+                    "quoteOracleVault": null
+                  }
+                },
+                "loanAsset": {
+                  "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                  "symbol": "USDC",
+                  "decimals": 6
+                },
+                "collateralAsset": {
+                  "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+                  "symbol": "WETH",
+                  "decimals": 18
+                },
+                "state": {
+                  "supplyAssetsUsd": 9266592.44407424,
+                  "borrowAssetsUsd": 8362024.9343662625,
+                  "liquidityAssetsUsd": 904567.5097079762,
+                  "utilization": 0.9023840192425399
+                }
+              }
+            },
+            {
+              "supplyAssetsUsd": 2249.758266173586,
+              "market": {
+                "marketId": "0xbc99de6a88904cd0e69042ad6f266e63182801f030c636507c3caf590ffd84fe",
+                "lltv": "860000000000000000",
+                "irmAddress": "0x870aC11D48B15DB9a138Cf899d20F13F79Ba00BC",
+                "oracle": {
+                  "address": "0x9F983115741D0F7F2EAE07831415057AD3de34d2",
+                  "type": "Unknown",
+                  "data": null
+                },
+                "loanAsset": {
+                  "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                  "symbol": "USDC",
+                  "decimals": 6
+                },
+                "collateralAsset": {
+                  "address": "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf",
+                  "symbol": "cbBTC",
+                  "decimals": 8
+                },
+                "state": {
+                  "supplyAssetsUsd": 1052163.4940310048,
+                  "borrowAssetsUsd": 954373.354858191,
+                  "liquidityAssetsUsd": 97790.13917281386,
+                  "utilization": 0.9070580382919727
+                }
+              }
+            },
+            {
+              "supplyAssetsUsd": 6982320.442969159,
+              "market": {
+                "marketId": "0x64d65c9a2d91c36d56fbc42d69e979335320169b3df63bf92789e2c8883fcc64",
+                "lltv": "860000000000000000",
+                "irmAddress": "0x870aC11D48B15DB9a138Cf899d20F13F79Ba00BC",
+                "oracle": {
+                  "address": "0xA6D6950c9F177F1De7f7757FB33539e3Ec60182a",
+                  "type": "ChainlinkOracleV2",
+                  "data": {
+                    "baseFeedOne": {
+                      "address": "0xF4030086522a5bEEa4988F8cA5B36dbC97BeE88c"
+                    },
+                    "baseFeedTwo": null,
+                    "quoteFeedOne": null,
+                    "quoteFeedTwo": null,
+                    "baseOracleVault": null,
+                    "quoteOracleVault": null
+                  }
+                },
+                "loanAsset": {
+                  "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                  "symbol": "USDC",
+                  "decimals": 6
+                },
+                "collateralAsset": {
+                  "address": "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf",
+                  "symbol": "cbBTC",
+                  "decimals": 8
+                },
+                "state": {
+                  "supplyAssetsUsd": 337147199.6331395,
+                  "borrowAssetsUsd": 303897731.6774507,
+                  "liquidityAssetsUsd": 33249467.95568878,
+                  "utilization": 0.9013799669940353
+                }
+              }
+            },
+            {
+              "supplyAssetsUsd": 8149503.655509822,
+              "market": {
+                "marketId": "0x3a85e619751152991742810df6ec69ce473daef99e28a64ab2340d7b7ccfee49",
+                "lltv": "860000000000000000",
+                "irmAddress": "0x870aC11D48B15DB9a138Cf899d20F13F79Ba00BC",
+                "oracle": {
+                  "address": "0xDddd770BADd886dF3864029e4B377B5F6a2B6b83",
+                  "type": "ChainlinkOracle",
+                  "data": {
+                    "baseFeedOne": {
+                      "address": "0xfdFD9C85aD200c506Cf9e21F1FD8dd01932FBB23"
+                    },
+                    "baseFeedTwo": {
+                      "address": "0xF4030086522a5bEEa4988F8cA5B36dbC97BeE88c"
+                    },
+                    "quoteFeedOne": {
+                      "address": "0x8fFfFfd4AfB6115b954Bd326cbe7B4BA576818f6"
+                    },
+                    "quoteFeedTwo": null,
+                    "baseOracleVault": null
+                  }
+                },
+                "loanAsset": {
+                  "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                  "symbol": "USDC",
+                  "decimals": 6
+                },
+                "collateralAsset": {
+                  "address": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
+                  "symbol": "WBTC",
+                  "decimals": 8
+                },
+                "state": {
+                  "supplyAssetsUsd": 129244503.09845212,
+                  "borrowAssetsUsd": 116078602.10830359,
+                  "liquidityAssetsUsd": 13165900.990148524,
+                  "utilization": 0.8981318301783451
+                }
+              }
+            },
+            {
+              "supplyAssetsUsd": 0,
+              "market": {
+                "marketId": "0x54efdee08e272e929034a8f26f7ca34b1ebe364b275391169b28c6d7db24dbc8",
+                "lltv": 0,
+                "irmAddress": "0x0000000000000000000000000000000000000000",
+                "oracle": null,
+                "loanAsset": {
+                  "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                  "symbol": "USDC",
+                  "decimals": 6
+                },
+                "collateralAsset": null,
+                "state": {
+                  "supplyAssetsUsd": 639857.571940873,
+                  "borrowAssetsUsd": 0,
+                  "liquidityAssetsUsd": 639857.571940873,
+                  "utilization": 0
+                }
+              }
+            },
+            {
+              "supplyAssetsUsd": 1984.6464383413904,
+              "market": {
+                "marketId": "0xb323495f7e4148be5643a4ea4a8221eef163e4bccfdedc2a6f4696baacbc86cc",
+                "lltv": "860000000000000000",
+                "irmAddress": "0x870aC11D48B15DB9a138Cf899d20F13F79Ba00BC",
+                "oracle": {
+                  "address": "0x48F7E36EB6B826B2dF4B2E630B62Cd25e89E40e2",
+                  "type": "ChainlinkOracle",
+                  "data": {
+                    "baseFeedOne": {
+                      "address": "0x4F67e4d9BD67eFa28236013288737D39AeF48e79"
+                    },
+                    "baseFeedTwo": null,
+                    "quoteFeedOne": {
+                      "address": "0x986b5E1e1755e3C2440e960477f25201B0a8bbD4"
+                    },
+                    "quoteFeedTwo": null,
+                    "baseOracleVault": null
+                  }
+                },
+                "loanAsset": {
+                  "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                  "symbol": "USDC",
+                  "decimals": 6
+                },
+                "collateralAsset": {
+                  "address": "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0",
+                  "symbol": "wstETH",
+                  "decimals": 18
+                },
+                "state": {
+                  "supplyAssetsUsd": 32588933.76072781,
+                  "borrowAssetsUsd": 29374712.456421267,
+                  "liquidityAssetsUsd": 3214221.3043065453,
+                  "utilization": 0.9013707742663268
+                }
+              }
+            }
+          ]
+        },
+        "liquidity": {
+          "usd": 17419418.22162864,
+          "underlying": 17424513924357
+        }
+      },
+      "provenance": {
+        "endpoint": "https://api.morpho.org/graphql",
+        "queryName": "VaultRiskSnapshot",
+        "retrievedAt": "2026-10-10T23:49:59.644Z",
+        "indexedBlock": null,
+        "sourceTimestamp": null,
+        "restState": {
+          "endpoint": "https://api.morpho.org/v0/vaults-v1/1:0xdd0f28e19C1780eb6396170735D45153D261490d/state",
+          "retrievedAt": "2026-10-10T23:49:59.644Z",
+          "indexedBlock": "26165430",
+          "withdrawableAssetsRaw": "17424514443942",
+          "totalAssetsRaw": "22002213699615"
+        },
+        "restStateNote": "REST vault state is independently indexed; its block does not timestamp the GraphQL USD allocations.",
+        "note": "The selected GraphQL response does not expose an indexed block or market update timestamp. Retrieval time is not blockchain time."
+      }
+    },
+    {
+      "id": "smokehouse-usdc",
+      "address": "0xBEeFFF209270748ddd194831b3fa287a5386f5bC",
+      "raw": {
+        "address": "0xBEeFFF209270748ddd194831b3fa287a5386f5bC",
+        "name": "Smokehouse USDC",
+        "chain": {
+          "id": 1
+        },
+        "asset": {
+          "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "symbol": "USDC",
+          "decimals": 6
+        },
+        "state": {
+          "totalAssetsUsd": 12746239.656140173,
+          "allocation": [
+            {
+              "supplyAssetsUsd": 2263383.0668593943,
+              "market": {
+                "marketId": "0x2a0b893471c785a1f0fda00df7fca578b703eef7ae7186d2429c2824b5212467",
+                "lltv": "915000000000000000",
+                "irmAddress": "0x870aC11D48B15DB9a138Cf899d20F13F79Ba00BC",
+                "oracle": {
+                  "address": "0x52eA2C12734B5bB61e1edf52Bb0f01D9206493Fc",
+                  "type": "ChainlinkOracleV2",
+                  "data": {
+                    "baseFeedOne": {
+                      "address": "0x50449B3D1f5931d568A1951Ee506A9534e7f7dFf"
+                    },
+                    "baseFeedTwo": null,
+                    "quoteFeedOne": null,
+                    "quoteFeedTwo": null,
+                    "baseOracleVault": null,
+                    "quoteOracleVault": null
+                  }
+                },
+                "loanAsset": {
+                  "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                  "symbol": "USDC",
+                  "decimals": 6
+                },
+                "collateralAsset": {
+                  "address": "0x4614F7A56A3Eb83b2Ff9fA4B4b9575B28Fb68644",
+                  "symbol": "wFalconX",
+                  "decimals": 18
+                },
+                "state": {
+                  "supplyAssetsUsd": 24057011.719931174,
+                  "borrowAssetsUsd": 21692958.33563057,
+                  "liquidityAssetsUsd": 2364053.384300607,
+                  "utilization": 0.9017312120132529
+                }
+              }
+            },
+            {
+              "supplyAssetsUsd": 85964.62834471092,
+              "market": {
+                "marketId": "0xc498f4bfdda99e60ea8eb04c1e145654a70bc59da76ef9c6ed54a1314d78e5b5",
+                "lltv": "915000000000000000",
+                "irmAddress": "0x870aC11D48B15DB9a138Cf899d20F13F79Ba00BC",
+                "oracle": {
+                  "address": "0xF3EFa46246d319381F5E7023Ae83F9C23C11b0F6",
+                  "type": "ChainlinkOracleV2",
+                  "data": {
+                    "baseFeedOne": {
+                      "address": "0xb49f677943BC038e9857d61E7d053CaA2C1734C1"
+                    },
+                    "baseFeedTwo": null,
+                    "quoteFeedOne": null,
+                    "quoteFeedTwo": null,
+                    "baseOracleVault": {
+                      "address": "0xbeef0C075Da5D01112AE5cF34d257074fB5DDB2f"
+                    },
+                    "quoteOracleVault": null
+                  }
+                },
+                "loanAsset": {
+                  "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                  "symbol": "USDC",
+                  "decimals": 6
+                },
+                "collateralAsset": {
+                  "address": "0xbeef0C075Da5D01112AE5cF34d257074fB5DDB2f",
+                  "symbol": "steakEURCV",
+                  "decimals": 18
+                },
+                "state": {
+                  "supplyAssetsUsd": 11905298.007564886,
+                  "borrowAssetsUsd": 10783836.788588615,
+                  "liquidityAssetsUsd": 1121461.2189762695,
+                  "utilization": 0.9058014996127213
+                }
+              }
+            },
+            {
+              "supplyAssetsUsd": 2228963.173115535,
+              "market": {
+                "marketId": "0x85252bb8485c99bba46fe149c7dd2aad83672640f53c630890673cf1848ba16e",
+                "lltv": "860000000000000000",
+                "irmAddress": "0x870aC11D48B15DB9a138Cf899d20F13F79Ba00BC",
+                "oracle": {
+                  "address": "0xa3A7A3ceFee206f9d7Fe00eC3C83324ED4228411",
+                  "type": "ChainlinkOracleV2",
+                  "data": {
+                    "baseFeedOne": {
+                      "address": "0x4270E1817576bbA4b640466bE79A408Ef128F828"
+                    },
+                    "baseFeedTwo": {
+                      "address": "0xc0053f3FBcCD593758258334Dfce24C2A9A673aD"
+                    },
+                    "quoteFeedOne": {
+                      "address": "0xc3866d726C204C0836E0677A31973c649888973D"
+                    },
+                    "quoteFeedTwo": null,
+                    "baseOracleVault": null,
+                    "quoteOracleVault": null
+                  }
+                },
+                "loanAsset": {
+                  "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                  "symbol": "USDC",
+                  "decimals": 6
+                },
+                "collateralAsset": {
+                  "address": "0xCd5fE23C85820F7B72D0926FC9b05b43E359b7ee",
+                  "symbol": "weETH",
+                  "decimals": 18
+                },
+                "state": {
+                  "supplyAssetsUsd": 43557887.714921616,
+                  "borrowAssetsUsd": 39486401.58883193,
+                  "liquidityAssetsUsd": 4071486.126089678,
+                  "utilization": 0.9065270071694751
+                }
+              }
+            },
+            {
+              "supplyAssetsUsd": 87181.93979756953,
+              "market": {
+                "marketId": "0x34377fc4f617c51818e92c79df31ff270c6a91bc94ad32e367fdf59b9f4ac5dd",
+                "lltv": "770000000000000000",
+                "irmAddress": "0x870aC11D48B15DB9a138Cf899d20F13F79Ba00BC",
+                "oracle": {
+                  "address": "0xa3A7A3ceFee206f9d7Fe00eC3C83324ED4228411",
+                  "type": "ChainlinkOracleV2",
+                  "data": {
+                    "baseFeedOne": {
+                      "address": "0x4270E1817576bbA4b640466bE79A408Ef128F828"
+                    },
+                    "baseFeedTwo": {
+                      "address": "0xc0053f3FBcCD593758258334Dfce24C2A9A673aD"
+                    },
+                    "quoteFeedOne": {
+                      "address": "0xc3866d726C204C0836E0677A31973c649888973D"
+                    },
+                    "quoteFeedTwo": null,
+                    "baseOracleVault": null,
+                    "quoteOracleVault": null
+                  }
+                },
+                "loanAsset": {
+                  "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                  "symbol": "USDC",
+                  "decimals": 6
+                },
+                "collateralAsset": {
+                  "address": "0xCd5fE23C85820F7B72D0926FC9b05b43E359b7ee",
+                  "symbol": "weETH",
+                  "decimals": 18
+                },
+                "state": {
+                  "supplyAssetsUsd": 423267.72042106715,
+                  "borrowAssetsUsd": 383851.1354163936,
+                  "liquidityAssetsUsd": 39416.585004673565,
+                  "utilization": 0.9068755232138612
+                }
+              }
+            },
+            {
+              "supplyAssetsUsd": 0,
+              "market": {
+                "marketId": "0xbc99de6a88904cd0e69042ad6f266e63182801f030c636507c3caf590ffd84fe",
+                "lltv": "860000000000000000",
+                "irmAddress": "0x870aC11D48B15DB9a138Cf899d20F13F79Ba00BC",
+                "oracle": {
+                  "address": "0x9F983115741D0F7F2EAE07831415057AD3de34d2",
+                  "type": "Unknown",
+                  "data": null
+                },
+                "loanAsset": {
+                  "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                  "symbol": "USDC",
+                  "decimals": 6
+                },
+                "collateralAsset": {
+                  "address": "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf",
+                  "symbol": "cbBTC",
+                  "decimals": 8
+                },
+                "state": {
+                  "supplyAssetsUsd": 1052163.4940310048,
+                  "borrowAssetsUsd": 954373.354858191,
+                  "liquidityAssetsUsd": 97790.13917281386,
+                  "utilization": 0.9070580382919727
+                }
+              }
+            },
+            {
+              "supplyAssetsUsd": 0,
+              "market": {
+                "marketId": "0x22fe4c688161863c73571a2b8db65cc11a4a6bceee4f0dea4aa83e4b784f1bd9",
+                "lltv": "915000000000000000",
+                "irmAddress": "0x870aC11D48B15DB9a138Cf899d20F13F79Ba00BC",
+                "oracle": {
+                  "address": "0x3464a61A68C486241FE07201C913F055Bdce35BF",
+                  "type": "Unknown",
+                  "data": null
+                },
+                "loanAsset": {
+                  "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                  "symbol": "USDC",
+                  "decimals": 6
+                },
+                "collateralAsset": {
+                  "address": "0xdC169AbE56461A2E0c034Da431Ac2a3ebf596094",
+                  "symbol": "PT-sUSDS-26NOV2026",
+                  "decimals": 18
+                },
+                "state": {
+                  "supplyAssetsUsd": 14256085.162516804,
+                  "borrowAssetsUsd": 12680998.298912587,
+                  "liquidityAssetsUsd": 1575086.8636042178,
+                  "utilization": 0.8895147689110642
+                }
+              }
+            },
+            {
+              "supplyAssetsUsd": 424940.53775378247,
+              "market": {
+                "marketId": "0x4565ac05d38b19374ccbb04c17cca60ca9353cd41824f0803d0fc7704f60eaed",
+                "lltv": "915000000000000000",
+                "irmAddress": "0x870aC11D48B15DB9a138Cf899d20F13F79Ba00BC",
+                "oracle": {
+                  "address": "0xA66a4F03Fd8031973f8C7718904ce32385f54E70",
+                  "type": "ChainlinkOracleV2",
+                  "data": {
+                    "baseFeedOne": {
+                      "address": "0x72B5760cFBE437DD01409f44055fDfB8f8121B46"
+                    },
+                    "baseFeedTwo": null,
+                    "quoteFeedOne": null,
+                    "quoteFeedTwo": null,
+                    "baseOracleVault": null,
+                    "quoteOracleVault": null
+                  }
+                },
+                "loanAsset": {
+                  "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                  "symbol": "USDC",
+                  "decimals": 6
+                },
+                "collateralAsset": {
+                  "address": "0x5086bf358635B81D8C47C66d1C8b9E567Db70c72",
+                  "symbol": "reUSD",
+                  "decimals": 18
+                },
+                "state": {
+                  "supplyAssetsUsd": 10185053.161478914,
+                  "borrowAssetsUsd": 9185345.60594827,
+                  "liquidityAssetsUsd": 999707.5555306459,
+                  "utilization": 0.9018456222387077
+                }
+              }
+            },
+            {
+              "supplyAssetsUsd": 0,
+              "market": {
+                "marketId": "0x85c7f4374f3a403b36d54cc284983b2b02bbd8581ee0f3c36494447b87d9fcab",
+                "lltv": "915000000000000000",
+                "irmAddress": "0x870aC11D48B15DB9a138Cf899d20F13F79Ba00BC",
+                "oracle": {
+                  "address": "0x873CD44b860DEDFe139f93e12A4AcCa0926Ffb87",
+                  "type": "ChainlinkOracleV2",
+                  "data": {
+                    "baseFeedOne": null,
+                    "baseFeedTwo": null,
+                    "quoteFeedOne": null,
+                    "quoteFeedTwo": null,
+                    "baseOracleVault": {
+                      "address": "0x9D39A5DE30e57443BfF2A8307A4256c8797A3497"
+                    },
+                    "quoteOracleVault": null
+                  }
+                },
+                "loanAsset": {
+                  "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                  "symbol": "USDC",
+                  "decimals": 6
+                },
+                "collateralAsset": {
+                  "address": "0x9D39A5DE30e57443BfF2A8307A4256c8797A3497",
+                  "symbol": "sUSDe",
+                  "decimals": 18
+                },
+                "state": {
+                  "supplyAssetsUsd": 9543.60566786086,
+                  "borrowAssetsUsd": 3901.5750251871073,
+                  "liquidityAssetsUsd": 5642.0306426737525,
+                  "utilization": 0.40881561549908646
+                }
+              }
+            },
+            {
+              "supplyAssetsUsd": 0,
+              "market": {
+                "marketId": "0x2412afc9614939a5d994397fe0b94a4f6fb8bc02bfc139e1a5956a865e2efe26",
+                "lltv": "915000000000000000",
+                "irmAddress": "0x870aC11D48B15DB9a138Cf899d20F13F79Ba00BC",
+                "oracle": {
+                  "address": "0x4C0fE43eCF0C552F9cFE40D07B7fb5235d808076",
+                  "type": "ChainlinkOracleV2",
+                  "data": {
+                    "baseFeedOne": {
+                      "address": "0x9037AEaa3c2dED079eF36ED6E11e102e05c1E999"
+                    },
+                    "baseFeedTwo": {
+                      "address": "0x14f0737d6b705259e521EA6E9E3506AC78dBd311"
+                    },
+                    "quoteFeedOne": null,
+                    "quoteFeedTwo": null,
+                    "baseOracleVault": null,
+                    "quoteOracleVault": null
+                  }
+                },
+                "loanAsset": {
+                  "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                  "symbol": "USDC",
+                  "decimals": 6
+                },
+                "collateralAsset": {
+                  "address": "0xc1906aeCf868749a2DeE203F59b904c0cf212140",
+                  "symbol": "PT-USDG-24SEP2026",
+                  "decimals": 6
+                },
+                "state": {
+                  "supplyAssetsUsd": 1.0089378553908603,
+                  "borrowAssetsUsd": 0.9182413868304536,
+                  "liquidityAssetsUsd": 0.09069646856040679,
+                  "utilization": 0.9101069822330423
+                }
+              }
+            },
+            {
+              "supplyAssetsUsd": 10.953272838897744,
+              "market": {
+                "marketId": "0xeffa583f87a425f68b8ba0c62408b2afe5c30dac436c680fbd2ee3836f037e1d",
+                "lltv": "625000000000000000",
+                "irmAddress": "0x870aC11D48B15DB9a138Cf899d20F13F79Ba00BC",
+                "oracle": {
+                  "address": "0xeCcf43900d96c79fB36122818b42F40bDe01597c",
+                  "type": "Unknown",
+                  "data": null
+                },
+                "loanAsset": {
+                  "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                  "symbol": "USDC",
+                  "decimals": 6
+                },
+                "collateralAsset": {
+                  "address": "0xf6b1117ec07684D3958caD8BEb1b302bfD21103f",
+                  "symbol": "TSLAon",
+                  "decimals": 18
+                },
+                "state": {
+                  "supplyAssetsUsd": 104.47362732790262,
+                  "borrowAssetsUsd": 94.63124552003141,
+                  "liquidityAssetsUsd": 9.842381807871204,
+                  "utilization": 0.9057907525601677
+                }
+              }
+            },
+            {
+              "supplyAssetsUsd": 0,
+              "market": {
+                "marketId": "0x1a9ccaca2dba9469cd9cba3d077466761b05f465c412d2bf2c71614c4963dd84",
+                "lltv": "915000000000000000",
+                "irmAddress": "0x870aC11D48B15DB9a138Cf899d20F13F79Ba00BC",
+                "oracle": {
+                  "address": "0x68066D2891254F1F3285Cac0bB16B65B28EE3cAb",
+                  "type": "ChainlinkOracleV2",
+                  "data": {
+                    "baseFeedOne": {
+                      "address": "0xAfFd8F5578E8590665de561bdE9E7BAdb99300d9"
+                    },
+                    "baseFeedTwo": null,
+                    "quoteFeedOne": null,
+                    "quoteFeedTwo": null,
+                    "baseOracleVault": null,
+                    "quoteOracleVault": null
+                  }
+                },
+                "loanAsset": {
+                  "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                  "symbol": "USDC",
+                  "decimals": 6
+                },
+                "collateralAsset": {
+                  "address": "0x14d60E7FDC0D71d8611742720E4C50E7a974020c",
+                  "symbol": "USCC",
+                  "decimals": 6
+                },
+                "state": {
+                  "supplyAssetsUsd": 1.3247024847581037,
+                  "borrowAssetsUsd": 1.062699128604632,
+                  "liquidityAssetsUsd": 0.26200335615347164,
+                  "utilization": 0.8022172078877661
+                }
+              }
+            },
+            {
+              "supplyAssetsUsd": 0,
+              "market": {
+                "marketId": "0xbf02d6c6852fa0b8247d5514d0c91e6c1fbde9a168ac3fd2033028b5ee5ce6d0",
+                "lltv": "860000000000000000",
+                "irmAddress": "0x870aC11D48B15DB9a138Cf899d20F13F79Ba00BC",
+                "oracle": {
+                  "address": "0xDCc04fFaCD7B49035cCdBbbA59a5f955944129DB",
+                  "type": "ChainlinkOracleV2",
+                  "data": {
+                    "baseFeedOne": {
+                      "address": "0xb415eAA355D8440ac7eCB602D3fb67ccC1f0bc81"
+                    },
+                    "baseFeedTwo": {
+                      "address": "0xF4030086522a5bEEa4988F8cA5B36dbC97BeE88c"
+                    },
+                    "quoteFeedOne": null,
+                    "quoteFeedTwo": null,
+                    "baseOracleVault": null,
+                    "quoteOracleVault": null
+                  }
+                },
+                "loanAsset": {
+                  "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                  "symbol": "USDC",
+                  "decimals": 6
+                },
+                "collateralAsset": {
+                  "address": "0x8236a87084f8B84306f72007F36F2618A5634494",
+                  "symbol": "LBTC",
+                  "decimals": 8
+                },
+                "state": {
+                  "supplyAssetsUsd": 1927736.7242240936,
+                  "borrowAssetsUsd": 1727938.7129449574,
+                  "liquidityAssetsUsd": 199798.0112791362,
+                  "utilization": 0.8963561731389673
+                }
+              }
+            },
+            {
+              "supplyAssetsUsd": 3186560.590082779,
+              "market": {
+                "marketId": "0x1e9d614631a7df0ec07fb05b2c8cb2491575fd1a63a33bf187a6afb295a4fc64",
+                "lltv": "915000000000000000",
+                "irmAddress": "0x870aC11D48B15DB9a138Cf899d20F13F79Ba00BC",
+                "oracle": {
+                  "address": "0x217d6DdCDB95112C51657F6270e8C079CFDB51f0",
+                  "type": "ChainlinkOracleV2",
+                  "data": {
+                    "baseFeedOne": {
+                      "address": "0x77eE147391EAc11c92817e771860ff4AAd265D89"
+                    },
+                    "baseFeedTwo": null,
+                    "quoteFeedOne": null,
+                    "quoteFeedTwo": null,
+                    "baseOracleVault": null,
+                    "quoteOracleVault": null
+                  }
+                },
+                "loanAsset": {
+                  "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                  "symbol": "USDC",
+                  "decimals": 6
+                },
+                "collateralAsset": {
+                  "address": "0xeCfaFdC7741323a945A163ed068B5a3C43483957",
+                  "symbol": "PT-reUSD-10DEC2026",
+                  "decimals": 6
+                },
+                "state": {
+                  "supplyAssetsUsd": 125401889.28408194,
+                  "borrowAssetsUsd": 106855642.99957998,
+                  "liquidityAssetsUsd": 18546246.284501966,
+                  "utilization": 0.8521055273538358
+                }
+              }
+            },
+            {
+              "supplyAssetsUsd": 3618662.977159649,
+              "market": {
+                "marketId": "0xef2c308b5abecf5c8750a1aa82b47c558005feb7a03f4f8e1ad682d71ac8d0ba",
+                "lltv": "915000000000000000",
+                "irmAddress": "0x870aC11D48B15DB9a138Cf899d20F13F79Ba00BC",
+                "oracle": {
+                  "address": "0x0cB1928EcA8783F05a07D9Ae2AfB33f38BFBEb78",
+                  "type": "ChainlinkOracleV2",
+                  "data": {
+                    "baseFeedOne": {
+                      "address": "0x4386307a07C4de7Ba11B4F4ec3e1f37BBE95dC99"
+                    },
+                    "baseFeedTwo": null,
+                    "quoteFeedOne": null,
+                    "quoteFeedTwo": null,
+                    "baseOracleVault": null,
+                    "quoteOracleVault": null
+                  }
+                },
+                "loanAsset": {
+                  "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                  "symbol": "USDC",
+                  "decimals": 6
+                },
+                "collateralAsset": {
+                  "address": "0x238a700eD6165261Cf8b2e544ba797BC11e466Ba",
+                  "symbol": "mF-ONE",
+                  "decimals": 18
+                },
+                "state": {
+                  "supplyAssetsUsd": 24497910.965558853,
+                  "borrowAssetsUsd": 22091899.91960277,
+                  "liquidityAssetsUsd": 2406011.0459560812,
+                  "utilization": 0.9017870932203711
+                }
+              }
+            },
+            {
+              "supplyAssetsUsd": 0,
+              "market": {
+                "marketId": "0x7e585a933ffe8443c371b4f8cfeb4430f5f6a14c2f32a898c26662c67a1cb8b8",
+                "lltv": "860000000000000000",
+                "irmAddress": "0x870aC11D48B15DB9a138Cf899d20F13F79Ba00BC",
+                "oracle": {
+                  "address": "0xe087AD7FE989cF63F8383579D160a20Ee7e69F9F",
+                  "type": "ChainlinkOracleV2",
+                  "data": {
+                    "baseFeedOne": {
+                      "address": "0x4F67e4d9BD67eFa28236013288737D39AeF48e79"
+                    },
+                    "baseFeedTwo": {
+                      "address": "0xc0053f3FBcCD593758258334Dfce24C2A9A673aD"
+                    },
+                    "quoteFeedOne": null,
+                    "quoteFeedTwo": null,
+                    "baseOracleVault": null,
+                    "quoteOracleVault": null
+                  }
+                },
+                "loanAsset": {
+                  "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                  "symbol": "USDC",
+                  "decimals": 6
+                },
+                "collateralAsset": {
+                  "address": "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0",
+                  "symbol": "wstETH",
+                  "decimals": 18
+                },
+                "state": {
+                  "supplyAssetsUsd": 12547430.60431771,
+                  "borrowAssetsUsd": 11316213.896346625,
+                  "liquidityAssetsUsd": 1231216.707971083,
+                  "utilization": 0.9018749936303766
+                }
+              }
+            },
+            {
+              "supplyAssetsUsd": 0,
+              "market": {
+                "marketId": "0x94b823e6bd8ea533b4e33fbc307faea0b307301bc48763acc4d4aa4def7636cd",
+                "lltv": "860000000000000000",
+                "irmAddress": "0x870aC11D48B15DB9a138Cf899d20F13F79Ba00BC",
+                "oracle": {
+                  "address": "0x0F948CBa8231Db7898ef36A4212581Ad7b1B4580",
+                  "type": "ChainlinkOracleV2",
+                  "data": {
+                    "baseFeedOne": {
+                      "address": "0xc0053f3FBcCD593758258334Dfce24C2A9A673aD"
+                    },
+                    "baseFeedTwo": null,
+                    "quoteFeedOne": null,
+                    "quoteFeedTwo": null,
+                    "baseOracleVault": null,
+                    "quoteOracleVault": null
+                  }
+                },
+                "loanAsset": {
+                  "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                  "symbol": "USDC",
+                  "decimals": 6
+                },
+                "collateralAsset": {
+                  "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+                  "symbol": "WETH",
+                  "decimals": 18
+                },
+                "state": {
+                  "supplyAssetsUsd": 9266592.44407424,
+                  "borrowAssetsUsd": 8362024.9343662625,
+                  "liquidityAssetsUsd": 904567.5097079762,
+                  "utilization": 0.9023840192425399
+                }
+              }
+            },
+            {
+              "supplyAssetsUsd": 1386.0939889002834,
+              "market": {
+                "marketId": "0x61765602144e91e5ac9f9e98b8584eae308f9951596fd7f5e0f59f21cd2bf664",
+                "lltv": "860000000000000000",
+                "irmAddress": "0x870aC11D48B15DB9a138Cf899d20F13F79Ba00BC",
+                "oracle": {
+                  "address": "0x5635a2F38c5dFd1d8fDB176d9CB5AEFA07bf6A68",
+                  "type": "ChainlinkOracleV2",
+                  "data": {
+                    "baseFeedOne": {
+                      "address": "0xdDb6F90fFb4d3257dd666b69178e5B3c5Bf41136"
+                    },
+                    "baseFeedTwo": null,
+                    "quoteFeedOne": null,
+                    "quoteFeedTwo": null,
+                    "baseOracleVault": null,
+                    "quoteOracleVault": null
+                  }
+                },
+                "loanAsset": {
+                  "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                  "symbol": "USDC",
+                  "decimals": 6
+                },
+                "collateralAsset": {
+                  "address": "0xCd5fE23C85820F7B72D0926FC9b05b43E359b7ee",
+                  "symbol": "weETH",
+                  "decimals": 18
+                },
+                "state": {
+                  "supplyAssetsUsd": 786196.3332773648,
+                  "borrowAssetsUsd": 707587.3314261023,
+                  "liquidityAssetsUsd": 78609.00185126248,
+                  "utilization": 0.9000135226736936
+                }
+              }
+            },
+            {
+              "supplyAssetsUsd": 0,
+              "market": {
+                "marketId": "0x09dc9e7eb5d8fc54b2bc41d1135fd4e99057a580f680321faeb90c7a21e631c1",
+                "lltv": "860000000000000000",
+                "irmAddress": "0x870aC11D48B15DB9a138Cf899d20F13F79Ba00BC",
+                "oracle": {
+                  "address": "0xf1561bC4b3D1bA49053986Fb9ee88D4fE22d0Cf4",
+                  "type": "Unknown",
+                  "data": null
+                },
+                "loanAsset": {
+                  "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                  "symbol": "USDC",
+                  "decimals": 6
+                },
+                "collateralAsset": {
+                  "address": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
+                  "symbol": "WBTC",
+                  "decimals": 8
+                },
+                "state": {
+                  "supplyAssetsUsd": 1506919.4941640366,
+                  "borrowAssetsUsd": 1359343.993397953,
+                  "liquidityAssetsUsd": 147575.5007660839,
+                  "utilization": 0.9020680923316667
+                }
+              }
+            },
+            {
+              "supplyAssetsUsd": 0.348834955304197,
+              "market": {
+                "marketId": "0xfb8d92086861bae6fb778917afd1de5dbbc4ec70edfb636fed48238e225e7e3d",
+                "lltv": "860000000000000000",
+                "irmAddress": "0x870aC11D48B15DB9a138Cf899d20F13F79Ba00BC",
+                "oracle": {
+                  "address": "0xD703c55B871D999eA5435aC3721B19296Ac249D1",
+                  "type": "Unknown",
+                  "data": null
+                },
+                "loanAsset": {
+                  "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                  "symbol": "USDC",
+                  "decimals": 6
+                },
+                "collateralAsset": {
+                  "address": "0x54C1Ff361b402f66c13107421E6A431C3375EF24",
+                  "symbol": "FLHYon",
+                  "decimals": 18
+                },
+                "state": {
+                  "supplyAssetsUsd": 56.4921073628084,
+                  "borrowAssetsUsd": 51.2177852603487,
+                  "liquidityAssetsUsd": 5.274322102459691,
+                  "utilization": 0.9066361240768291
+                }
+              }
+            },
+            {
+              "supplyAssetsUsd": 0,
+              "market": {
+                "marketId": "0x54efdee08e272e929034a8f26f7ca34b1ebe364b275391169b28c6d7db24dbc8",
+                "lltv": 0,
+                "irmAddress": "0x0000000000000000000000000000000000000000",
+                "oracle": null,
+                "loanAsset": {
+                  "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                  "symbol": "USDC",
+                  "decimals": 6
+                },
+                "collateralAsset": null,
+                "state": {
+                  "supplyAssetsUsd": 639857.571940873,
+                  "borrowAssetsUsd": 0,
+                  "liquidityAssetsUsd": 639857.571940873,
+                  "utilization": 0
+                }
+              }
+            },
+            {
+              "supplyAssetsUsd": 0,
+              "market": {
+                "marketId": "0xe4cfbee9af4ad713b41bf79f009ca02b17c001a0c0e7bd2e6a89b1111b3d3f08",
+                "lltv": "770000000000000000",
+                "irmAddress": "0x870aC11D48B15DB9a138Cf899d20F13F79Ba00BC",
+                "oracle": {
+                  "address": "0x57bfdF6aB73995C5af58A95A16798190e366CA5b",
+                  "type": "ChainlinkOracleV2",
+                  "data": {
+                    "baseFeedOne": {
+                      "address": "0xCf17f459F4D1D9e6fb5aa5013Bd2D7EB6083bd45"
+                    },
+                    "baseFeedTwo": null,
+                    "quoteFeedOne": {
+                      "address": "0x6a5a24455e5c9C288632944A88ceA923e0496024"
+                    },
+                    "quoteFeedTwo": null,
+                    "baseOracleVault": null,
+                    "quoteOracleVault": null
+                  }
+                },
+                "loanAsset": {
+                  "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                  "symbol": "USDC",
+                  "decimals": 6
+                },
+                "collateralAsset": {
+                  "address": "0x18084fbA666a33d37592fA2633fD49a74DD93a88",
+                  "symbol": "tBTC",
+                  "decimals": 18
+                },
+                "state": {
+                  "supplyAssetsUsd": 555130.7089146511,
+                  "borrowAssetsUsd": 495288.5837516106,
+                  "liquidityAssetsUsd": 59842.125163040524,
+                  "utilization": 0.8922017387940234
+                }
+              }
+            },
+            {
+              "supplyAssetsUsd": 0,
+              "market": {
+                "marketId": "0xeb17955ea422baeddbfb0b8d8c9086c5be7a9cfdefb292119a102e981a30062e",
+                "lltv": "915000000000000000",
+                "irmAddress": "0x870aC11D48B15DB9a138Cf899d20F13F79Ba00BC",
+                "oracle": {
+                  "address": "0x8E3386B2f6084eB1B0988070c3d826995BD175c0",
+                  "type": "ChainlinkOracleV2",
+                  "data": {
+                    "baseFeedOne": {
+                      "address": "0x797Fa8167C35b19A30a5E7973561588BfEc0A086"
+                    },
+                    "baseFeedTwo": {
+                      "address": "0x9A5a3c3Ed0361505cC1D4e824B3854De5724434A"
+                    },
+                    "quoteFeedOne": {
+                      "address": "0x8fFfFfd4AfB6115b954Bd326cbe7B4BA576818f6"
+                    },
+                    "quoteFeedTwo": null,
+                    "baseOracleVault": null,
+                    "quoteOracleVault": null
+                  }
+                },
+                "loanAsset": {
+                  "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                  "symbol": "USDC",
+                  "decimals": 6
+                },
+                "collateralAsset": {
+                  "address": "0x88887bE419578051FF9F4eb6C858A951921D8888",
+                  "symbol": "stcUSD",
+                  "decimals": 18
+                },
+                "state": {
+                  "supplyAssetsUsd": 4.849192465640062,
+                  "borrowAssetsUsd": 4.849192465640062,
+                  "liquidityAssetsUsd": 0,
+                  "utilization": 1
+                }
+              }
+            },
+            {
+              "supplyAssetsUsd": 849185.3469300583,
+              "market": {
+                "marketId": "0x64d65c9a2d91c36d56fbc42d69e979335320169b3df63bf92789e2c8883fcc64",
+                "lltv": "860000000000000000",
+                "irmAddress": "0x870aC11D48B15DB9a138Cf899d20F13F79Ba00BC",
+                "oracle": {
+                  "address": "0xA6D6950c9F177F1De7f7757FB33539e3Ec60182a",
+                  "type": "ChainlinkOracleV2",
+                  "data": {
+                    "baseFeedOne": {
+                      "address": "0xF4030086522a5bEEa4988F8cA5B36dbC97BeE88c"
+                    },
+                    "baseFeedTwo": null,
+                    "quoteFeedOne": null,
+                    "quoteFeedTwo": null,
+                    "baseOracleVault": null,
+                    "quoteOracleVault": null
+                  }
+                },
+                "loanAsset": {
+                  "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                  "symbol": "USDC",
+                  "decimals": 6
+                },
+                "collateralAsset": {
+                  "address": "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf",
+                  "symbol": "cbBTC",
+                  "decimals": 8
+                },
+                "state": {
+                  "supplyAssetsUsd": 337147199.6331395,
+                  "borrowAssetsUsd": 303897731.6774507,
+                  "liquidityAssetsUsd": 33249467.95568878,
+                  "utilization": 0.9013799669940353
+                }
+              }
+            },
+            {
+              "supplyAssetsUsd": 0,
+              "market": {
+                "marketId": "0xe83d72fa5b00dcd46d9e0e860d95aa540d5ec106da5833108a9f826f21f36f52",
+                "lltv": "770000000000000000",
+                "irmAddress": "0x870aC11D48B15DB9a138Cf899d20F13F79Ba00BC",
+                "oracle": {
+                  "address": "0x52eA2C12734B5bB61e1edf52Bb0f01D9206493Fc",
+                  "type": "ChainlinkOracleV2",
+                  "data": {
+                    "baseFeedOne": {
+                      "address": "0x50449B3D1f5931d568A1951Ee506A9534e7f7dFf"
+                    },
+                    "baseFeedTwo": null,
+                    "quoteFeedOne": null,
+                    "quoteFeedTwo": null,
+                    "baseOracleVault": null,
+                    "quoteOracleVault": null
+                  }
+                },
+                "loanAsset": {
+                  "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                  "symbol": "USDC",
+                  "decimals": 6
+                },
+                "collateralAsset": {
+                  "address": "0xC26A6Fa2C37b38E549a4a1807543801Db684f99C",
+                  "symbol": "AA_FalconXUSDC",
+                  "decimals": 18
+                },
+                "state": {
+                  "supplyAssetsUsd": 7425149.200704626,
+                  "borrowAssetsUsd": 6722108.342309685,
+                  "liquidityAssetsUsd": 703040.8583949406,
+                  "utilization": 0.9053162651158277
+                }
+              }
+            }
+          ]
+        },
+        "liquidity": {
+          "usd": 11485821.259252679,
+          "underlying": 11489181206754
+        }
+      },
+      "provenance": {
+        "endpoint": "https://api.morpho.org/graphql",
+        "queryName": "VaultRiskSnapshot",
+        "retrievedAt": "2026-10-10T23:49:59.787Z",
+        "indexedBlock": null,
+        "sourceTimestamp": null,
+        "restState": {
+          "endpoint": "https://api.morpho.org/v0/vaults-v1/1:0xBEeFFF209270748ddd194831b3fa287a5386f5bC/state",
+          "retrievedAt": "2026-10-10T23:49:59.787Z",
+          "indexedBlock": "26165430",
+          "withdrawableAssetsRaw": "11489183161020",
+          "totalAssetsRaw": "12749971138398"
+        },
+        "restStateNote": "REST vault state is independently indexed; its block does not timestamp the GraphQL USD allocations.",
+        "note": "The selected GraphQL response does not expose an indexed block or market update timestamp. Retrieval time is not blockchain time."
+      }
+    },
+    {
+      "id": "yearn-usdc",
+      "address": "0x68Aea7b82Df6CcdF76235D46445Ed83f85F845A3",
+      "raw": {
+        "address": "0x68Aea7b82Df6CcdF76235D46445Ed83f85F845A3",
+        "name": "Yearn USDC",
+        "chain": {
+          "id": 1
+        },
+        "asset": {
+          "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "symbol": "USDC",
+          "decimals": 6
+        },
+        "state": {
+          "totalAssetsUsd": 6168951.160628078,
+          "allocation": [
+            {
+              "supplyAssetsUsd": 3531.769119515402,
+              "market": {
+                "marketId": "0x6d2fba32b8649d92432d036c16aa80779034b7469b63abc259b17678857f31c2",
+                "lltv": "860000000000000000",
+                "irmAddress": "0x870aC11D48B15DB9a138Cf899d20F13F79Ba00BC",
+                "oracle": {
+                  "address": "0x167D283aCAC1b9ff39466A75aA82902f340f1F4D",
+                  "type": "ChainlinkOracleV2",
+                  "data": {
+                    "baseFeedOne": {
+                      "address": "0xeC4031539b851eEc918b41FE3e03d7236fEc7be8"
+                    },
+                    "baseFeedTwo": null,
+                    "quoteFeedOne": {
+                      "address": "0x4C7A561D15001C6ee5E05996591419b11962fa1A"
+                    },
+                    "quoteFeedTwo": null,
+                    "baseOracleVault": null,
+                    "quoteOracleVault": null
+                  }
+                },
+                "loanAsset": {
+                  "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                  "symbol": "USDC",
+                  "decimals": 6
+                },
+                "collateralAsset": {
+                  "address": "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0",
+                  "symbol": "wstETH",
+                  "decimals": 18
+                },
+                "state": {
+                  "supplyAssetsUsd": 841350.4289217654,
+                  "borrowAssetsUsd": 758507.9863060066,
+                  "liquidityAssetsUsd": 82842.44261575885,
+                  "utilization": 0.9015363399506128
+                }
+              }
+            },
+            {
+              "supplyAssetsUsd": 4053651.692322911,
+              "market": {
+                "marketId": "0x64d65c9a2d91c36d56fbc42d69e979335320169b3df63bf92789e2c8883fcc64",
+                "lltv": "860000000000000000",
+                "irmAddress": "0x870aC11D48B15DB9a138Cf899d20F13F79Ba00BC",
+                "oracle": {
+                  "address": "0xA6D6950c9F177F1De7f7757FB33539e3Ec60182a",
+                  "type": "ChainlinkOracleV2",
+                  "data": {
+                    "baseFeedOne": {
+                      "address": "0xF4030086522a5bEEa4988F8cA5B36dbC97BeE88c"
+                    },
+                    "baseFeedTwo": null,
+                    "quoteFeedOne": null,
+                    "quoteFeedTwo": null,
+                    "baseOracleVault": null,
+                    "quoteOracleVault": null
+                  }
+                },
+                "loanAsset": {
+                  "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                  "symbol": "USDC",
+                  "decimals": 6
+                },
+                "collateralAsset": {
+                  "address": "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf",
+                  "symbol": "cbBTC",
+                  "decimals": 8
+                },
+                "state": {
+                  "supplyAssetsUsd": 337147199.6331395,
+                  "borrowAssetsUsd": 303897731.6774507,
+                  "liquidityAssetsUsd": 33249467.95568878,
+                  "utilization": 0.9013799669940353
+                }
+              }
+            },
+            {
+              "supplyAssetsUsd": 311560.1193626311,
+              "market": {
+                "marketId": "0xb323495f7e4148be5643a4ea4a8221eef163e4bccfdedc2a6f4696baacbc86cc",
+                "lltv": "860000000000000000",
+                "irmAddress": "0x870aC11D48B15DB9a138Cf899d20F13F79Ba00BC",
+                "oracle": {
+                  "address": "0x48F7E36EB6B826B2dF4B2E630B62Cd25e89E40e2",
+                  "type": "ChainlinkOracle",
+                  "data": {
+                    "baseFeedOne": {
+                      "address": "0x4F67e4d9BD67eFa28236013288737D39AeF48e79"
+                    },
+                    "baseFeedTwo": null,
+                    "quoteFeedOne": {
+                      "address": "0x986b5E1e1755e3C2440e960477f25201B0a8bbD4"
+                    },
+                    "quoteFeedTwo": null,
+                    "baseOracleVault": null
+                  }
+                },
+                "loanAsset": {
+                  "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                  "symbol": "USDC",
+                  "decimals": 6
+                },
+                "collateralAsset": {
+                  "address": "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0",
+                  "symbol": "wstETH",
+                  "decimals": 18
+                },
+                "state": {
+                  "supplyAssetsUsd": 32588933.76072781,
+                  "borrowAssetsUsd": 29374712.456421267,
+                  "liquidityAssetsUsd": 3214221.3043065453,
+                  "utilization": 0.9013707742663268
+                }
+              }
+            },
+            {
+              "supplyAssetsUsd": 1797957.8402623732,
+              "market": {
+                "marketId": "0x3a85e619751152991742810df6ec69ce473daef99e28a64ab2340d7b7ccfee49",
+                "lltv": "860000000000000000",
+                "irmAddress": "0x870aC11D48B15DB9a138Cf899d20F13F79Ba00BC",
+                "oracle": {
+                  "address": "0xDddd770BADd886dF3864029e4B377B5F6a2B6b83",
+                  "type": "ChainlinkOracle",
+                  "data": {
+                    "baseFeedOne": {
+                      "address": "0xfdFD9C85aD200c506Cf9e21F1FD8dd01932FBB23"
+                    },
+                    "baseFeedTwo": {
+                      "address": "0xF4030086522a5bEEa4988F8cA5B36dbC97BeE88c"
+                    },
+                    "quoteFeedOne": {
+                      "address": "0x8fFfFfd4AfB6115b954Bd326cbe7B4BA576818f6"
+                    },
+                    "quoteFeedTwo": null,
+                    "baseOracleVault": null
+                  }
+                },
+                "loanAsset": {
+                  "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                  "symbol": "USDC",
+                  "decimals": 6
+                },
+                "collateralAsset": {
+                  "address": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
+                  "symbol": "WBTC",
+                  "decimals": 8
+                },
+                "state": {
+                  "supplyAssetsUsd": 129244503.09845212,
+                  "borrowAssetsUsd": 116078602.10830359,
+                  "liquidityAssetsUsd": 13165900.990148524,
+                  "utilization": 0.8981318301783451
+                }
+              }
+            },
+            {
+              "supplyAssetsUsd": 0,
+              "market": {
+                "marketId": "0x54efdee08e272e929034a8f26f7ca34b1ebe364b275391169b28c6d7db24dbc8",
+                "lltv": 0,
+                "irmAddress": "0x0000000000000000000000000000000000000000",
+                "oracle": null,
+                "loanAsset": {
+                  "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                  "symbol": "USDC",
+                  "decimals": 6
+                },
+                "collateralAsset": null,
+                "state": {
+                  "supplyAssetsUsd": 639857.571940873,
+                  "borrowAssetsUsd": 0,
+                  "liquidityAssetsUsd": 639857.571940873,
+                  "utilization": 0
+                }
+              }
+            },
+            {
+              "supplyAssetsUsd": 2249.739560645514,
+              "market": {
+                "marketId": "0xba3ba077d9c838696b76e29a394ae9f0d1517a372e30fd9a0fc19c516fb4c5a7",
+                "lltv": "860000000000000000",
+                "irmAddress": "0x870aC11D48B15DB9a138Cf899d20F13F79Ba00BC",
+                "oracle": {
+                  "address": "0xc7BE7593FD5453Db5AdcC1d7103f2211d4F2e40D",
+                  "type": "ChainlinkOracleV2",
+                  "data": {
+                    "baseFeedOne": {
+                      "address": "0xACE21E4A3cd5B5519FB6A999dF8B63b0Ce5A046A"
+                    },
+                    "baseFeedTwo": null,
+                    "quoteFeedOne": {
+                      "address": "0x8E5e906761677E24D3AFd77DB6A19Dd9ed83F8c2"
+                    },
+                    "quoteFeedTwo": null,
+                    "baseOracleVault": null,
+                    "quoteOracleVault": null
+                  }
+                },
+                "loanAsset": {
+                  "address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+                  "symbol": "USDC",
+                  "decimals": 6
+                },
+                "collateralAsset": {
+                  "address": "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf",
+                  "symbol": "cbBTC",
+                  "decimals": 8
+                },
+                "state": {
+                  "supplyAssetsUsd": 635223.8463327093,
+                  "borrowAssetsUsd": 573754.5922247285,
+                  "liquidityAssetsUsd": 61469.25410798074,
+                  "utilization": 0.9032321370445133
+                }
+              }
+            }
+          ]
+        },
+        "liquidity": {
+          "usd": 6168951.160628078,
+          "underlying": 6170755764023
+        }
+      },
+      "provenance": {
+        "endpoint": "https://api.morpho.org/graphql",
+        "queryName": "VaultRiskSnapshot",
+        "retrievedAt": "2026-10-10T23:49:59.996Z",
+        "indexedBlock": null,
+        "sourceTimestamp": null,
+        "restState": {
+          "endpoint": "https://api.morpho.org/v0/vaults-v1/1:0x68Aea7b82Df6CcdF76235D46445Ed83f85F845A3/state",
+          "retrievedAt": "2026-10-10T23:49:59.996Z",
+          "indexedBlock": "26165430",
+          "withdrawableAssetsRaw": "6170759040291",
+          "totalAssetsRaw": "6170759040291"
         },
         "restStateNote": "REST vault state is independently indexed; its block does not timestamp the GraphQL USD allocations.",
         "note": "The selected GraphQL response does not expose an indexed block or market update timestamp. Retrieval time is not blockchain time."

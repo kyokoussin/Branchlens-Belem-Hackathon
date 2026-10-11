@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { layoutGraph } from './graphLayout';
 import type { Graph, Impact, PortfolioData, Position } from './model';
 
@@ -35,11 +35,12 @@ export function GraphExplorer({ position, portfolio, view, selectedId, onSelect,
   }, [analysis.graph, impact, portfolio.portfolioGraph, portfolio.impactIndex, selectedId, visibleImpactSelections]);
   const layout = useMemo(() => layoutGraph(graph), [graph]);
   const viewport = useRef<HTMLDivElement>(null);
+  const lastFitKey = useRef('');
   const drag = useRef<{ x: number; y: number; left: number; top: number } | null>(null);
   const [zoom, setZoom] = useState(0.8);
   const [offset, setOffset] = useState({ x: 25, y: 20 });
   const [focusedPositionId, setFocusedPositionId] = useState<string | null>(null);
-  useEffect(() => setFocusedPositionId(null), [selectedId, view]);
+  useEffect(() => setFocusedPositionId(null), [selectedId, view, portfolio.portfolioIncident?.id]);
   const selected = layout.byId.get(selectedId) || layout.nodes.find((node) => node.type === 'Position') || layout.nodes[0];
   const scenario = position.simulation?.available ? position.simulation : null;
   const incidentMarkets = new Set(scenario?.marketIds || []);
@@ -68,22 +69,19 @@ export function GraphExplorer({ position, portfolio, view, selectedId, onSelect,
   const cbBtcNode = layout.nodes.find((node) => node.type === 'CollateralToken' && node.label.toLowerCase() === 'cbbtc');
   const incidentEdgeIds = new Set((scenario?.dependencyPaths || []).flatMap((path) => path.slice(0, -1).map((from, i) => `${from}|${path[i + 1]}`)));
 
-  useEffect(() => {
-    const node = layout.byId.get(selectedId);
+  useLayoutEffect(() => {
     const el = viewport.current;
-    if (!node || !el) return;
-    if (view === 'impact') {
-      setZoom(Math.max(0.35, Math.min(0.9, el.clientWidth / layout.width, el.clientHeight / layout.height)));
-      setOffset({ x: 12, y: 12 });
-      return;
-    }
-    setOffset({ x: Math.min(80, el.clientWidth * 0.42 - node.x * zoom), y: el.clientHeight * 0.43 - node.y * zoom });
-  }, [selectedId, position.id, layout, view]);
+    const key = `${position.id}:${view}:${portfolio.portfolioIncident?.id || 'baseline'}`;
+    if (!el || lastFitKey.current === key) return;
+    lastFitKey.current = key;
+    const next = Math.max(0.08, Math.min(1, (el.clientWidth - 32) / layout.width, (el.clientHeight - 32) / layout.height));
+    setZoom(next); setOffset({ x: 16, y: 16 });
+  }, [position.id, view, portfolio.portfolioIncident?.id, layout.width, layout.height]);
 
   function fit() {
     const el = viewport.current;
     if (!el) return;
-    const next = Math.max(0.32, Math.min(0.9, el.clientWidth / layout.width, el.clientHeight / layout.height));
+    const next = Math.max(0.08, Math.min(1, (el.clientWidth - 32) / layout.width, (el.clientHeight - 32) / layout.height));
     setZoom(next); setOffset({ x: 16, y: 16 });
   }
   const connectedEdges = graph.edges.filter((edge) => edge.from === selected.id || edge.to === selected.id);
@@ -93,13 +91,13 @@ export function GraphExplorer({ position, portfolio, view, selectedId, onSelect,
   const graphLabels = new Map(portfolio.portfolioGraph.nodes.map((node) => [node.id, `${node.type.replace(/([a-z])([A-Z])/g, '$1 $2')}: ${node.label}${node.type === 'LendingMarket' ? ` (${short(node.address || node.id)})` : ''}`]));
 
   return <div className={`explorer-grid ${view === 'impact' ? 'impact-view' : ''}`}>
-    <section className="graph-panel card"><div className="panel-heading"><div><div className="eyebrow">{view === 'impact' ? 'PORTFOLIO IMPACT MAP' : 'INTERACTIVE DEPENDENCY MAP'}</div><h2>{view === 'impact' ? 'Trace every affected investment' : 'Follow the capital'}</h2><p>{view === 'impact' ? 'Complete verified paths from each tracked position to the selected dependency.' : 'Click any node to inspect its evidence and financial reach.'} Drag to pan; scroll to zoom.</p></div><div className="graph-tools"><button onClick={() => setZoom((value) => Math.max(0.35, value - 0.15))} aria-label="Zoom out">−</button><span>{Math.round(zoom * 100)}%</span><button onClick={() => setZoom((value) => Math.min(1.5, value + 0.15))} aria-label="Zoom in">+</button><button onClick={fit}>Fit</button></div></div>
+    <section className="graph-panel card"><div className="panel-heading"><div><div className="eyebrow">{view === 'impact' ? 'PORTFOLIO IMPACT MAP' : 'INTERACTIVE DEPENDENCY MAP'}</div><h2>{view === 'impact' ? 'Trace every affected investment' : 'Follow the capital'}</h2><p>{view === 'impact' ? 'Complete verified paths from each tracked position to the selected dependency.' : 'Click any node to inspect its evidence and financial reach.'} Drag to pan; scroll to zoom.</p></div><div className="graph-tools"><button onClick={() => setZoom((value) => Math.max(0.08, value - 0.15))} aria-label="Zoom out">−</button><span>{Math.round(zoom * 100)}%</span><button onClick={() => setZoom((value) => Math.min(1.5, value + 0.15))} aria-label="Zoom in">+</button><button onClick={fit}>Fit</button></div></div>
       <div className="graph-shortcuts">{view === 'dependency' && <button onClick={() => onSelect(layout.nodes.find((node) => node.type === 'Position')?.id || '')}>Investment</button>}{cbBtcNode && <button onClick={() => onSelect(cbBtcNode.id)}>Focus cbBTC</button>}{view === 'impact' && focusedPositionId && <button onClick={() => setFocusedPositionId(null)}>Show all paths</button>}{scenario && <span className="scenario-key">Amber: hypothetical incident · No live depeg detected</span>}</div>
       <div className="graph-viewport" ref={viewport}
         onPointerDown={(event) => { if ((event.target as HTMLElement).closest('button')) return; drag.current = { x: event.clientX, y: event.clientY, left: offset.x, top: offset.y }; event.currentTarget.setPointerCapture(event.pointerId); }}
         onPointerMove={(event) => { if (drag.current) setOffset({ x: drag.current.left + event.clientX - drag.current.x, y: drag.current.top + event.clientY - drag.current.y }); }}
         onPointerUp={() => { drag.current = null; }} onPointerCancel={() => { drag.current = null; }}
-        onWheel={(event) => { event.preventDefault(); setZoom((value) => Math.max(0.35, Math.min(1.5, value - Math.sign(event.deltaY) * 0.08))); }}>
+        onWheel={(event) => { event.preventDefault(); setZoom((value) => Math.max(0.08, Math.min(1.5, value - Math.sign(event.deltaY) * 0.08))); }}>
         <div className="graph-stage" style={{ width: layout.width, height: layout.height, transform: `translate(${offset.x}px, ${offset.y}px) scale(${zoom})` }}>
           <svg className="graph-lines" width={layout.width} height={layout.height} aria-hidden="true">{graph.edges.map((edge) => {
             const from = layout.byId.get(edge.from); const to = layout.byId.get(edge.to);
@@ -137,7 +135,6 @@ export function GraphExplorer({ position, portfolio, view, selectedId, onSelect,
       <button className="primary view-impact-button" onClick={() => onViewImpact(selected.id)}>View Portfolio Impact →</button>
       {selected.type === 'Position' && <div className="inspect-list"><h3>Position at a glance</h3><p>{analysis.vault.asset.symbol} underlying · {analysis.vault.allocations.length} funded markets · {(Number(analysis.exposure.coverageRatio) * 100).toFixed(1)}% allocation coverage</p></div>}
       {selected.type === 'LendingMarket' && <div className="inspect-list"><h3>Market state</h3>{(() => { const row = analysis.vault.allocations.find((item) => item.marketId === selected.id.split(':').pop()); return row && <><p><strong>{row.collateral.symbol} / {row.loan.symbol}</strong> · {money(row.allocationUsd)} allocated</p><p>Liquidity {money(row.marketLiquidityUsd)} · Utilization {row.utilization == null ? 'Unknown' : `${(Number(row.utilization) * 100).toFixed(1)}%`}</p></>; })()}</div>}
-      <div className="inspect-list"><h3>Connected dependencies</h3><p>{connectedEdges.length} direct relationship{connectedEdges.length === 1 ? '' : 's'} · {selected.affectedMarketIds.length} affected funded markets</p><div className="connected-chips">{connectedEdges.slice(0, 6).map((edge) => { const other = graph.nodes.find((node) => node.id === (edge.from === selected.id ? edge.to : edge.from)); return other && <span key={edge.id}>{other.label}</span>; })}</div>{connectedEdges.length > 6 && <small>+{connectedEdges.length - 6} more connections</small>}</div>
       <div className="inspect-list"><h3>Risk observations</h3>{scenario && selected.id === cbBtcNode?.id && <p className="signal-warning">Simulated −30% price deviation · not a live observation <button onClick={onReview}>Review incident →</button></p>}{relatedFindings.slice(0, 3).map((finding) => <p key={finding.id}><strong>{finding.signalType === 'STRUCTURAL_WARNING' ? 'Concentration' : finding.status}</strong> · {finding.title}</p>)}{relatedFindings.length === 0 && !(scenario && selected.id === cbBtcNode?.id) && <p>No verified failure signal for this component.</p>}<p>{mechanisms[selected.type] || 'Specific failure impact requires further analysis.'}</p></div>
       <div className="inspect-list"><h3>Evidence & freshness</h3>{sources.map((source) => <p key={source}><a href={source} target="_blank" rel="noopener noreferrer">{source.includes('coinbase') ? 'Coinbase documentation' : 'Morpho API source'} ↗</a></p>)}<small>{position.dataMode === 'LIVE_API' ? 'Live API retrieved' : 'Historical snapshot retrieved'} {new Date(analysis.vault.provenance.retrievedAt).toLocaleString()}. {analysis.vault.provenance.sourceTimestamp ? 'Source time available.' : 'GraphQL index time not provided.'}</small><details className="technical-details"><summary>Technical details</summary>{selected.address && <p>{selected.type === 'LendingMarket' ? 'Market ID' : 'Address'} {/^0x[0-9a-fA-F]{40}$/.test(selected.address) ? <a href={`https://etherscan.io/address/${selected.address}`} target="_blank" rel="noopener noreferrer"><code>{selected.address}</code></a> : <code>{selected.address}</code>}</p>}<p>{analysis.graph.nodes.length} discovered nodes · {analysis.vault.allocations.length} allocations</p></details></div></>}
     </aside>

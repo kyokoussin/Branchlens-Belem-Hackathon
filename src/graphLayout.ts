@@ -16,14 +16,20 @@ export function layoutGraph(graph: Graph) {
   const markets = graph.nodes.filter((node) => node.type === 'LendingMarket');
   markets.forEach((node, index) => set(node, 455, 65 + index * 116));
   const middle = 65 + Math.max(0, markets.length - 1) * 58;
-  graph.nodes.filter((node) => node.type === 'Vault').forEach((node, index) => {
-    const ys = (outgoing.get(node.id) || []).map((id) => placed.get(id)?.y).filter((y): y is number => y != null);
-    set(node, 240, mean(ys, 65 + index * 116));
-  });
-  graph.nodes.filter((node) => node.type === 'Position').forEach((node, index) => {
-    const ys = (outgoing.get(node.id) || []).map((id) => placed.get(id)?.y).filter((y): y is number => y != null);
-    set(node, 25, mean(ys, 65 + index * 116));
-  });
+  // Shared markets give several vaults the same ideal anchor. Keep each lane
+  // collision-free so every affected position remains visible in Impact View.
+  for (const [type, x] of [['Vault', 240], ['Position', 25]] as const) {
+    const anchors = graph.nodes.filter((node) => node.type === type).map((node, index) => ({
+      node,
+      anchor: mean((outgoing.get(node.id) || []).map((id) => placed.get(id)?.y).filter((y): y is number => y != null), 65 + index * 116),
+    })).sort((a, b) => a.anchor - b.anchor);
+    let last = -72;
+    for (const { node, anchor } of anchors) {
+      const y = Math.max(anchor, last + 76);
+      set(node, x, y);
+      last = y;
+    }
+  }
   const lanes: Array<[string[], number]> = [
     [['CollateralToken', 'LoanToken'], 685],
     [['Oracle'], 905],
