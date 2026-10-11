@@ -1,7 +1,6 @@
 import Decimal from 'decimal.js';
 
 const money = (value) => new Decimal(value).toDecimalPlaces(2).toFixed(2);
-const insufficient = 'Insufficient data';
 
 export function evaluateImpactScenario(impact, positions, { type = 'DEPENDENCY_ONLY', marketLossPercent = '' } = {}) {
   const byId = new Map(positions.map((position) => [position.id, position]));
@@ -58,8 +57,8 @@ export function evaluateImpactScenario(impact, positions, { type = 'DEPENDENCY_O
     conditionalMaxAssumption: 'Hypothetical 100% permanent loss of every uniquely attributed dollar; not a prediction, probability, or observed loss.',
     estimatedFinancialLossUsd: total('estimatedFinancialLossUsd'),
     temporarilyInaccessibleCapitalUsd: total('temporarilyInaccessibleCapitalUsd'),
-    lossDisplay: total('estimatedFinancialLossUsd') ?? insufficient,
-    inaccessibleDisplay: total('temporarilyInaccessibleCapitalUsd') ?? insufficient,
+    lossDisplay: total('estimatedFinancialLossUsd') ?? 'Not established',
+    inaccessibleDisplay: total('temporarilyInaccessibleCapitalUsd') ?? 'Not measured',
     note: notes[type] || notes.DEPENDENCY_ONLY,
     affectedPositions: rows,
   };
