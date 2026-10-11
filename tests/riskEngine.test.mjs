@@ -63,5 +63,7 @@ describe('financial integrity', () => {
     expect(first.incidents[0].id).toBe(second.incidents[0].id);
     expect(first.incidents[0].dependencyPaths).toHaveLength(2);
     expect(first.graph.edges.every((edge) => ['OBSERVED', 'ASSUMED', 'DERIVED', 'UNKNOWN'].includes(edge.status))).toBe(true);
+    expect(first.graph.edges.every((edge) => ['API', 'UNKNOWN'].includes(edge.evidence.provenance) && 'retrievedAt' in edge.evidence && edge.evidence.source)).toBe(true);
+    expect(first.findings.every((finding) => finding.rule_id && finding.dependency_id && finding.timestamp === provenance.retrievedAt && finding.unique_exposure_usd === finding.capitalExposedUsd)).toBe(true);
   });
 });

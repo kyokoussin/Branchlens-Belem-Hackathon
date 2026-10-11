@@ -72,18 +72,21 @@ export async function buildPortfolio({ source = 'auto', scenario = false, snapsh
       entry = { raw: stored.raw, provenance: { ...stored.provenance, retrievedAt: stored.provenance.retrievedAt, snapshotCapturedAt: stored.capturedAt || snapshot.capturedAt } };
     }
     const analysis = addGraphImpact(addDocumentedCbbtcDependencies(formatIncidents(analyzeSubject(entry, position))));
+    analysis.findings = analysis.findings.map((finding) => ({ ...finding, affected_positions: [position.id] }));
     analysis.graph.nodes = analysis.graph.nodes.map((node) => node.type === 'Position' ? { ...node, label: `${position.name || analysis.vault.name} · simulated ${position.positionType === 'borrow' ? 'borrow' : 'supply'}` } : node);
     if (warning) analysis.vault.warnings.push(warning);
     const previous = monitoringBaseline.get(position.id);
     const current = {
-      markets: analysis.vault.allocations.map((row) => `${row.marketId}:${row.allocationUsd}`).join('|'),
+      topology: analysis.vault.allocations.map((row) => `${row.marketId}:${row.collateral.address}:${row.loan.address}:${row.oracleAddress}`).sort().join('|'),
+      measurements: analysis.vault.allocations.map((row) => `${row.marketId}:${row.allocationUsd}:${row.utilization}:${row.marketLiquidityUsd}:${row.marketBorrowUsd}`).sort().join('|'),
       totalUsd: analysis.vault.totalUsd,
-      findingKeys: analysis.findings.filter((item) => item.status === 'TRIGGERED').map((item) => item.id).join('|'),
+      findingKeys: analysis.findings.map((item) => `${item.id}:${item.status}:${item.evidence?.[0]?.observed ?? 'UNKNOWN'}`).sort().join('|'),
     };
     const changes = mode === 'LIVE_API' && previous ? [
-      previous.markets !== current.markets ? 'Funded market allocations changed' : null,
+      previous.topology !== current.topology ? 'Market or dependency structure changed' : null,
+      previous.measurements !== current.measurements ? 'Market allocations or measurements changed' : null,
       previous.totalUsd !== current.totalUsd ? 'Vault total assets changed' : null,
-      previous.findingKeys !== current.findingKeys ? 'Structural rule outcomes changed' : null,
+      previous.findingKeys !== current.findingKeys ? 'Rule observations or outcomes changed' : null,
     ].filter(Boolean) : [];
     if (mode === 'LIVE_API') monitoringBaseline.set(position.id, current);
     const simulation = scenario && position.positionType !== 'borrow' ? simulateCbbtcDepeg(analysis) : null;
@@ -107,6 +110,8 @@ export function aggregateLoadedPortfolio(loaded, scenario = false, snapshotCaptu
     detectionRule: simulations[0].simulation.detectionRule,
     affectedPositions: cbBtcImpact.affectedPositions.map((item) => ({ id: item.id, name: item.name, assumedPrincipalUsd: item.assumedPrincipalUsd, exposedPrincipalUsd: item.exposedPrincipalUsd, markets: item.marketIds, dataMode: item.dataMode })),
     uniqueCapitalExposedUsd: cbBtcImpact.uniqueCapitalExposedUsd,
+    conditionalMaxPrincipalLossUsd: cbBtcImpact.uniqueCapitalExposedUsd,
+    conditionalMaxAssumption: 'Hypothetical 100% permanent loss of every uniquely attributed dollar; not an estimate from the 30% cbBTC price shock.',
     estimatedFinancialLossUsd: null,
     temporarilyInaccessibleCapitalUsd: null,
     estimationNote: 'A 30% collateral price move does not establish realized lender bad debt or withdrawal blockage. Borrower health, liquidations, recoveries, and wallet-specific liquidity are needed.',

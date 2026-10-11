@@ -5,7 +5,6 @@ const D = (value) => new Decimal(String(value));
 const money = (value) => D(value).toDecimalPlaces(2).toFixed(2);
 const ratio = (value) => D(value).toDecimalPlaces(6).toString();
 const addr = (value) => typeof value === 'string' && /^0x[0-9a-fA-F]{40}$/.test(value) ? value.toLowerCase() : null;
-const evidence = (field, source = 'https://api.morpho.org/graphql') => ({ source, field, status: 'OBSERVED' });
 const shortAddress = (value) => `${value.slice(0, 6)}…${value.slice(-4)}`;
 const unique = (rows) => [...new Map(rows.map((row) => [row.marketId, row])).values()];
 
@@ -119,7 +118,13 @@ export function buildGraph(vault, { positionRole = 'SUPPLIER' } = {}) {
   function edge(from, to, type, status, field) {
     const id = `${from}|${type}|${to}`;
     if (seenEdges.has(id)) return;
-    seenEdges.add(id); edges.push({ id, from, to, type, status, evidence: evidence(field) });
+    const observed = status === 'OBSERVED';
+    seenEdges.add(id); edges.push({ id, from, to, type, status, evidence: {
+      field, source: observed ? vault.provenance.endpoint : 'Analyst-entered simulated holding',
+      retrievedAt: observed ? vault.provenance.retrievedAt : null,
+      sourceTimestamp: observed ? vault.provenance.sourceTimestamp ?? null : null,
+      provenance: observed ? 'API' : 'UNKNOWN',
+    } });
   }
   const chainId = `chain:${vault.chainId}`;
   const marketPosition = vault.version === 'MORPHO_MARKET';
@@ -195,6 +200,7 @@ export function unionExposure(exposure, marketIds) {
 
 export function detectRisks(vault, exposure, options = {}) {
   const threshold = options.concentrationThreshold ?? '0.40';
+  if (!D(threshold).isFinite() || D(threshold).lte(0) || D(threshold).gt(1)) throw new DataError('Concentration threshold must be above zero and at most one.');
   const findings = [];
   const requested = D(exposure.assumedPrincipalUsd);
   const liquidity = vault.liquidityUsd == null ? null : D(vault.liquidityUsd);
@@ -247,7 +253,14 @@ export function detectRisks(vault, exposure, options = {}) {
     });
   }
   findings.sort((a, b) => (b.status === 'TRIGGERED') - (a.status === 'TRIGGERED') || D(b.capitalExposedUsd).comparedTo(a.capitalExposedUsd));
-  return findings;
+  return findings.map((finding) => ({ ...finding,
+    rule_id: finding.detector, dependency_id: finding.subjectId,
+    observed_value: finding.evidence?.[0]?.observed ?? null,
+    threshold: finding.evidence?.[0]?.threshold ?? null,
+    timestamp: vault.provenance.retrievedAt,
+    provenance: { type: 'API', source: vault.provenance.endpoint, sourceTimestamp: vault.provenance.sourceTimestamp ?? null },
+    affected_positions: [], unique_exposure_usd: finding.capitalExposedUsd,
+  }));
 }
 
 export function analyze(raw, provenance, positionUsd = '1000000', options = {}) {

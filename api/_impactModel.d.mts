@@ -13,6 +13,8 @@ export function evaluateImpactScenario(
 ): {
   type: string;
   affectedCapitalUsd: string;
+  conditionalMaxPrincipalLossUsd: string;
+  conditionalMaxAssumption: string;
   estimatedFinancialLossUsd: string | null;
   temporarilyInaccessibleCapitalUsd: string | null;
   lossDisplay: string;

@@ -57,7 +57,7 @@ export function evaluateBorrowerScenario({ market, collateralPriceUsd, loanPrice
 }
 
 export function compareHoldExit(input) {
-  const { probabilityPercent, incrementalLossUsd, gasUsd, slippageUsd, feesUsd, unwindUsd, repaymentCapacityUsd, debtValueUsd, exitRemovesRisk = true } = input;
+  const { probabilityPercent, incrementalLossUsd, gasUsd, slippageUsd, feesUsd, unwindUsd, repaymentCapacityUsd, debtValueUsd, positionPrincipalUsd, exitPercent = '100', exitRemovesRisk = true } = input;
   const missing = ['probabilityPercent', 'incrementalLossUsd', 'gasUsd', 'slippageUsd', 'feesUsd', 'unwindUsd', 'repaymentCapacityUsd'].filter((key) => input[key] == null || input[key] === '');
   if (missing.length || !exitRemovesRisk) return { recommendation: 'INSUFFICIENT_DATA', missing: !exitRemovesRisk ? [...missing, 'residual risk after exit'] : missing, reason: 'Analyst assumptions or a verified exit route are required before comparing HOLD and EXIT.' };
   const probability = nonnegative(probabilityPercent, 'Incident probability').div(100);
@@ -69,15 +69,26 @@ export function compareHoldExit(input) {
   const unwind = nonnegative(unwindUsd, 'Other unwind cost');
   const repayCapacity = nonnegative(repaymentCapacityUsd, 'Available repayment funds');
   const debt = nonnegative(debtValueUsd, 'Debt value');
+  const fraction = positive(exitPercent, 'Exit percent').div(100);
+  if (fraction.gt(1)) throw new Error('Exit percent must be above 0% and at most 100%.');
+  const principal = positionPrincipalUsd == null ? null : nonnegative(positionPrincipalUsd, 'Position collateral value');
   const exitCost = gas.plus(slippage).plus(fees).plus(unwind);
   const expectedHoldLoss = probability.mul(loss);
+  const avoidedExpectedLoss = expectedHoldLoss.mul(fraction);
+  const residualExpectedLoss = expectedHoldLoss.minus(avoidedExpectedLoss);
+  const requiredRepayment = debt.mul(fraction);
   const result = {
     expectedHoldLossUsd: usd(expectedHoldLoss), exitCostUsd: usd(exitCost),
-    breakEvenProbabilityPercent: loss.isZero() ? null : ratio(exitCost.div(loss).mul(100)),
-    requiredRepaymentUsd: usd(debt), availableRepaymentUsd: usd(repayCapacity),
-    inputs: { probabilityPercent: D(probabilityPercent).toString(), incrementalLossUsd: loss.toString(), gasUsd: gas.toString(), slippageUsd: slippage.toString(), feesUsd: fees.toString(), unwindUsd: unwind.toString(), exitRemovesRisk },
-    caveat: 'Debt repayment returns borrowed principal; it is a funding requirement, not an exit cost. All economic inputs are analyst estimates, not live quotes.',
+    avoidedExpectedLossUsd: usd(avoidedExpectedLoss), residualExpectedLossUsd: usd(residualExpectedLoss),
+    remainingExposureUsd: principal == null ? null : usd(principal.mul(D(1).minus(fraction))),
+    remainingDebtUsd: usd(debt.mul(D(1).minus(fraction))),
+    requestedExitPercent: ratio(fraction.mul(100)),
+    breakEvenProbabilityPercent: loss.isZero() ? null : ratio(exitCost.div(loss.mul(fraction)).mul(100)),
+    requiredRepaymentUsd: usd(requiredRepayment), availableRepaymentUsd: usd(repayCapacity),
+    quoteStatus: 'NOT_QUOTED',
+    inputs: { probabilityPercent: D(probabilityPercent).toString(), incrementalLossUsd: loss.toString(), gasUsd: gas.toString(), slippageUsd: slippage.toString(), feesUsd: fees.toString(), unwindUsd: unwind.toString(), exitPercent: ratio(fraction.mul(100)), exitRemovesRisk },
+    caveat: 'Partial exits assume debt repayment and collateral release in the same proportion; this has not been quoted or executed. Costs and probability are analyst estimates, not live quotes.',
   };
-  if (repayCapacity.lt(debt)) return { ...result, recommendation: 'EXIT_BLOCKED', reason: 'Available repayment funds are below the debt amount needed to release collateral.' };
-  return { ...result, recommendation: expectedHoldLoss.gt(exitCost) ? 'EXIT_FAVORED' : 'HOLD_FAVORED', reason: expectedHoldLoss.gt(exitCost) ? 'Assumed expected incremental hold loss exceeds estimated exit cost.' : 'Estimated exit cost is at least as high as assumed expected incremental hold loss.' };
+  if (repayCapacity.lt(requiredRepayment)) return { ...result, recommendation: 'EXIT_BLOCKED', reason: 'Available repayment funds are below the proportional debt amount needed for the assumed exit.' };
+  return { ...result, recommendation: avoidedExpectedLoss.gt(exitCost) ? fraction.eq(1) ? 'EXIT_FAVORED' : 'PARTIAL_EXIT_FAVORED' : 'HOLD_FAVORED', reason: avoidedExpectedLoss.gt(exitCost) ? 'Assumed expected loss avoided by the requested exit exceeds analyst-estimated exit costs.' : 'Analyst-estimated exit costs are at least as high as the assumed loss avoided.' };
 }

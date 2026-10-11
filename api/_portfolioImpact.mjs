@@ -103,7 +103,7 @@ export function buildImpactIndex(positions) {
       estimatedFinancialLossUsd: null,
       temporarilyInaccessibleCapitalUsd: null,
       estimationNote: 'A dependency path and allocated capital do not establish an incident, permanent loss, or withdrawal blockage.',
-      sources: [...new Set(relevantEdges.map((edge) => edge.evidence?.source).filter(Boolean))],
+      sources: [...new Set(relevantEdges.map((edge) => edge.evidence?.source).filter((source) => /^https?:\/\//.test(source || '')))],
       evidenceStatuses: [...new Set(relevantEdges.map((edge) => edge.status))],
     };
   }

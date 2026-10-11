@@ -54,6 +54,8 @@ export function evaluateImpactScenario(impact, positions, { type = 'DEPENDENCY_O
   return {
     type,
     affectedCapitalUsd: impact.uniqueCapitalExposedUsd,
+    conditionalMaxPrincipalLossUsd: impact.uniqueCapitalExposedUsd,
+    conditionalMaxAssumption: 'Hypothetical 100% permanent loss of every uniquely attributed dollar; not a prediction, probability, or observed loss.',
     estimatedFinancialLossUsd: total('estimatedFinancialLossUsd'),
     temporarilyInaccessibleCapitalUsd: total('temporarilyInaccessibleCapitalUsd'),
     lossDisplay: total('estimatedFinancialLossUsd') ?? insufficient,

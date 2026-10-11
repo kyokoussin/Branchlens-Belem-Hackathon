@@ -1,5 +1,5 @@
 import { ZodError } from 'zod';
-import { approveDecision, createAnalysis, getReport, getRun, getWorkspace, listReports, putWorkspace, sendToSimulatedBot, updateAssumptions } from './_workflowService.mjs';
+import { approveDecision, createAnalysis, getReport, getRun, getWorkspace, listReports, putWorkspace, sendToSimulatedBot, updateAssumptions, updateIncidentStatus } from './_workflowService.mjs';
 import { listMorphoMarkets } from './_morphoClient.mjs';
 
 async function bodyOf(req) {
@@ -36,6 +36,7 @@ export default async function workflowHandler(req, res) {
     if (action === 'workspace') return send(res, 200, await putWorkspace(body));
     if (action === 'analyze') return send(res, 200, await createAnalysis(body));
     if (action === 'assumptions') return send(res, 200, await updateAssumptions(body.runId, body.assumptions));
+    if (action === 'incident-status') return send(res, 200, await updateIncidentStatus(body.runId, body.status));
     if (action === 'approve') return send(res, 200, await approveDecision(body.runId, body));
     if (action === 'send') return send(res, 200, await sendToSimulatedBot(body.runId));
     return send(res, 404, { error: 'Unknown workflow action.' });

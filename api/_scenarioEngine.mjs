@@ -34,7 +34,7 @@ export function addDocumentedCbbtcDependencies(analysis) {
     [tokenId, issuerId, 'ISSUED_BY', 'Coinbase cbBTC issuer statement'],
     [tokenId, backingId, 'BACKED_BY', 'Coinbase 1:1 backing statement'],
     [backingId, issuerId, 'CUSTODIED_BY', 'Coinbase custody statement'],
-  ]) graph.edges.push({ id: `${from}|${type}|${to}`, from, to, type, status: 'DOCUMENTED', evidence: { source: CBBTC_SOURCE, field } });
+  ]) graph.edges.push({ id: `${from}|${type}|${to}`, from, to, type, status: 'DOCUMENTED', evidence: { source: CBBTC_SOURCE, field, retrievedAt: null, sourceTimestamp: null, provenance: 'VERIFIED_REFERENCE' } });
   graph.coverage = 'Funded Morpho V1 allocations observed; cbBTC issuer/backing/custody from Coinbase documentation only. Oracle upstream feeds, reserve attestation, governance and external protocols remain UNKNOWN.';
   return { ...analysis, graph };
 }
