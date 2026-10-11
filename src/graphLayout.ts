@@ -11,11 +11,20 @@ export function layoutGraph(graph: Graph) {
     incoming.set(edge.to, [...(incoming.get(edge.to) || []), edge.from]);
     outgoing.set(edge.from, [...(outgoing.get(edge.from) || []), edge.to]);
   }
-  const set = (node: GraphNode, x: number, y: number) => placed.set(node.id, { ...node, x, y, width: 190, height: 62 });
+  const height = (node: GraphNode) => {
+    const parents = incoming.get(node.id)?.length || 0;
+    return parents > 1 ? 124 : parents === 1 ? 88 : 62;
+  };
+  const set = (node: GraphNode, x: number, y: number) => placed.set(node.id, { ...node, x, y, width: 190, height: height(node) });
   const mean = (values: number[], fallback: number) => values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : fallback;
   const markets = graph.nodes.filter((node) => node.type === 'LendingMarket');
-  markets.forEach((node, index) => set(node, 595, 65 + index * 116));
-  const middle = 65 + Math.max(0, markets.length - 1) * 58;
+  let marketBottom = 51;
+  markets.forEach((node) => {
+    const y = marketBottom + 14;
+    set(node, 595, y);
+    marketBottom = y + height(node);
+  });
+  const middle = 65 + Math.max(0, marketBottom - 65) / 2;
   // Shared markets give several vaults the same ideal anchor. Keep each lane
   // collision-free so every affected position remains visible in Impact View.
   for (const [type, x] of [['Vault', 310], ['Position', 25]] as const) {
@@ -23,11 +32,11 @@ export function layoutGraph(graph: Graph) {
       node,
       anchor: mean((outgoing.get(node.id) || []).map((id) => placed.get(id)?.y).filter((y): y is number => y != null), 65 + index * 116),
     })).sort((a, b) => a.anchor - b.anchor);
-    let last = -72;
+    let lastBottom = 51;
     for (const { node, anchor } of anchors) {
-      const y = Math.max(anchor, last + 76);
+      const y = Math.max(anchor, lastBottom + 14);
       set(node, x, y);
-      last = y;
+      lastBottom = y + height(node);
     }
   }
   const lanes: Array<[string[], number]> = [
@@ -38,11 +47,11 @@ export function layoutGraph(graph: Graph) {
   for (const [types, x] of lanes) {
     const anchor = (node: GraphNode) => mean((incoming.get(node.id) || []).map((id) => placed.get(id)?.y).filter((y): y is number => y != null), middle);
     const lane = graph.nodes.filter((node) => types.includes(node.type)).sort((a, b) => anchor(a) - anchor(b));
-    let last = -72;
+    let lastBottom = 51;
     for (const node of lane) {
-      const y = Math.max(anchor(node), last + 76);
+      const y = Math.max(anchor(node), lastBottom + 14);
       set(node, x, y);
-      last = y;
+      lastBottom = y + height(node);
     }
   }
   // A newly verified protocol layer remains visible without changing this layout.

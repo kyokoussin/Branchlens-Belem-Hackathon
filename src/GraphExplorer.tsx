@@ -45,6 +45,16 @@ export function GraphExplorer({ position, portfolio, view, selectedId, onSelect,
   }, [analysis.graph, impact, portfolio.portfolioGraph, portfolio.impactIndex, selectedId, visibleImpactSelections, global, view]);
   const shares = useMemo(() => calculateGraphShares(graph, global || view === 'impact' ? portfolio.positions : [position], global || view === 'impact'), [graph, global, view, portfolio.positions, position]);
   const layout = useMemo(() => layoutGraph(graph), [graph]);
+  const incomingShares = useMemo(() => {
+    const byNode = new Map<string, Array<{ parent: string; label: string }>>();
+    for (const edge of graph.edges) {
+      const parent = layout.byId.get(edge.from);
+      const rows = byNode.get(edge.to) || [];
+      rows.push({ parent: parent?.label || edge.from, label: shares[edge.id]?.label || 'Unknown' });
+      byNode.set(edge.to, rows);
+    }
+    return byNode;
+  }, [graph.edges, layout.byId, shares]);
   const viewport = useRef<HTMLDivElement>(null);
   const lastFitKey = useRef('');
   const drag = useRef<{ x: number; y: number; left: number; top: number } | null>(null);
@@ -87,8 +97,13 @@ export function GraphExplorer({ position, portfolio, view, selectedId, onSelect,
     if (!el || lastFitKey.current === key) return;
     lastFitKey.current = key;
     const next = Math.max(0.08, Math.min(1, (el.clientWidth - 32) / layout.width, (el.clientHeight - 32) / layout.height));
-    setZoom(next); setOffset({ x: 16, y: 16 });
-  }, [position.id, view, selectedId, global, portfolio.portfolioIncident?.id, layout.width, layout.height]);
+    // Large live graphs become unreadable when every node is fitted at once.
+    // Start at an inspectable scale; the Fit button still shows the full graph.
+    const initialZoom = Math.max(0.55, next);
+    const investment = !global && view === 'dependency' ? layout.nodes.find((node) => node.type === 'Position') : null;
+    setZoom(initialZoom);
+    setOffset({ x: 16, y: investment ? 42 - investment.y * initialZoom : 16 });
+  }, [position.id, view, selectedId, global, portfolio.portfolioIncident?.id, layout]);
 
   function fit() {
     const el = viewport.current;
@@ -103,7 +118,7 @@ export function GraphExplorer({ position, portfolio, view, selectedId, onSelect,
   const graphLabels = new Map(portfolio.portfolioGraph.nodes.map((node) => [node.id, `${node.type.replace(/([a-z])([A-Z])/g, '$1 $2')}: ${node.label}${node.type === 'LendingMarket' ? ` (${short(node.address || node.id)})` : ''}`]));
 
   return <div className={`explorer-grid ${view === 'impact' ? 'impact-view' : ''}`}>
-    <section className="graph-panel card"><div className="panel-heading"><div><div className="eyebrow">{view === 'impact' ? 'PORTFOLIO IMPACT MAP' : 'INTERACTIVE DEPENDENCY MAP'}</div><h2>{view === 'impact' ? 'Trace every affected investment' : 'Follow the capital'}</h2><p>{view === 'impact' ? 'Complete verified paths from each tracked position to the selected dependency.' : 'Click any node to inspect its evidence and financial reach.'} Edge percentages show the share of capital linked to the preceding node. Drag to pan; scroll to zoom.</p></div><div className="graph-tools"><button onClick={() => setZoom((value) => Math.max(0.08, value - 0.15))} aria-label="Zoom out">−</button><span>{Math.round(zoom * 100)}%</span><button onClick={() => setZoom((value) => Math.min(1.5, value + 0.15))} aria-label="Zoom in">+</button><button onClick={fit}>Fit</button></div></div>
+    <section className="graph-panel card"><div className="panel-heading"><div><div className="eyebrow">{view === 'impact' ? 'PORTFOLIO IMPACT MAP' : 'INTERACTIVE DEPENDENCY MAP'}</div><h2>{view === 'impact' ? 'Trace every affected investment' : 'Follow the capital'}</h2><p>{view === 'impact' ? 'Complete verified paths from each tracked position to the selected dependency.' : 'Click any node to inspect its evidence and financial reach.'} Percentages inside each box show the share of capital linked from its preceding node. Drag to pan; scroll to zoom.</p></div><div className="graph-tools"><button onClick={() => setZoom((value) => Math.max(0.08, value - 0.15))} aria-label="Zoom out">−</button><span>{Math.round(zoom * 100)}%</span><button onClick={() => setZoom((value) => Math.min(1.5, value + 0.15))} aria-label="Zoom in">+</button><button onClick={fit}>Fit</button></div></div>
       <div className="graph-shortcuts">{view === 'dependency' && <button onClick={() => onSelect(layout.nodes.find((node) => node.type === 'Position')?.id || '')}>Investment</button>}{cbBtcNode && <button onClick={() => onSelect(cbBtcNode.id)}>Focus cbBTC</button>}{view === 'impact' && focusedPositionId && <button onClick={() => setFocusedPositionId(null)}>Show all paths</button>}{scenario && <span className="scenario-key">Amber: hypothetical incident · No live depeg detected</span>}</div>
       <div className="graph-viewport" ref={viewport}
         onPointerDown={(event) => { if ((event.target as HTMLElement).closest('button')) return; drag.current = { x: event.clientX, y: event.clientY, left: offset.x, top: offset.y }; event.currentTarget.setPointerCapture(event.pointerId); }}
@@ -117,15 +132,14 @@ export function GraphExplorer({ position, portfolio, view, selectedId, onSelect,
             const x1 = from.x + from.width; const y1 = from.y + from.height / 2; const x2 = to.x; const y2 = to.y + to.height / 2;
             const selectedPath = selectedEdgeIds.has(edge.id);
             const incidentPath = incidentEdgeIds.has(`${edge.from}|${edge.to}`) || (scenario && edge.from === cbBtcNode?.id);
-            const share = shares[edge.id];
-            const labelX = x2 - x1 <= 305 ? (x1 + x2) / 2 : x1 + 50;
-            const labelY = x2 - x1 <= 305 ? (y1 + y2) / 2 - 8 : y1 + (y2 - y1) * 0.12 - 8;
-            return <g key={edge.id} className={view === 'impact' && !impactEdgeIds.has(edge.id) ? 'graph-edge dimmed' : 'graph-edge'}><path d={`M ${x1} ${y1} C ${x1 + 46} ${y1}, ${x2 - 46} ${y2}, ${x2} ${y2}`} className={`graph-line ${view === 'impact' ? impactEdgeIds.has(edge.id) ? 'impact-highlight' : 'dimmed' : incidentPath ? 'incident' : selectedPath ? 'selected' : ''} ${edge.status === 'DOCUMENTED' ? 'documented' : ''}`} /><text x={labelX} y={labelY} className="graph-edge-share" textAnchor="middle">{share?.label || 'Unknown'}</text></g>;
+            return <g key={edge.id} className={view === 'impact' && !impactEdgeIds.has(edge.id) ? 'graph-edge dimmed' : 'graph-edge'}><path d={`M ${x1} ${y1} C ${x1 + 46} ${y1}, ${x2 - 46} ${y2}, ${x2} ${y2}`} className={`graph-line ${view === 'impact' ? impactEdgeIds.has(edge.id) ? 'impact-highlight' : 'dimmed' : incidentPath ? 'incident' : selectedPath ? 'selected' : ''} ${edge.status === 'DOCUMENTED' ? 'documented' : ''}`} /></g>;
           })}</svg>
           {layout.nodes.map((node) => {
             const isIncident = incidentMarkets.has(node.id.split(':').pop() || '') || (scenario && node.id === cbBtcNode?.id);
             const isRelated = node.id === selected.id || (node.type === 'LendingMarket' && relatedMarkets.has(node.id.split(':').pop() || ''));
-            return <button key={node.id} className={`map-node ${node.type.toLowerCase()} ${node.id === selected.id ? 'active' : ''} ${isIncident ? 'incident' : ''} ${isRelated ? 'related' : ''} ${view === 'impact' && !impactNodeIds.has(node.id) ? 'dimmed' : ''}`} style={{ left: node.x, top: node.y, width: node.width, height: node.height }} title={node.address || node.label} onClick={(event) => { event.stopPropagation(); onSelect(node.id); }}><span>{node.type.replace(/([a-z])([A-Z])/g, '$1 $2')}</span><strong>{node.label}</strong></button>;
+            const nodeShares = incomingShares.get(node.id) || [];
+            const shareDetails = nodeShares.map((row) => `${row.label} of ${row.parent}`).join('\n');
+            return <button key={node.id} className={`map-node ${node.type.toLowerCase()} ${node.id === selected.id ? 'active' : ''} ${isIncident ? 'incident' : ''} ${isRelated ? 'related' : ''} ${view === 'impact' && !impactNodeIds.has(node.id) ? 'dimmed' : ''}`} style={{ left: node.x, top: node.y, width: node.width, height: node.height }} title={[node.address || node.label, shareDetails].filter(Boolean).join('\n')} onClick={(event) => { event.stopPropagation(); onSelect(node.id); }}><span>{node.type.replace(/([a-z])([A-Z])/g, '$1 $2')}</span><strong>{node.label}</strong>{nodeShares.length > 0 && <div className="node-share-list" onWheel={(event) => event.stopPropagation()} onPointerDown={(event) => event.stopPropagation()}>{nodeShares.map((row, index) => <div className="node-share" key={`${node.id}-${index}`}><b>{row.label}</b><small title={row.parent}>of {row.parent}</small></div>)}</div>}</button>;
           })}
         </div>
       </div>
