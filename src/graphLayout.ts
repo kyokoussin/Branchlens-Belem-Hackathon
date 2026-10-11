@@ -14,11 +14,11 @@ export function layoutGraph(graph: Graph) {
   const set = (node: GraphNode, x: number, y: number) => placed.set(node.id, { ...node, x, y, width: 190, height: 62 });
   const mean = (values: number[], fallback: number) => values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : fallback;
   const markets = graph.nodes.filter((node) => node.type === 'LendingMarket');
-  markets.forEach((node, index) => set(node, 455, 65 + index * 116));
+  markets.forEach((node, index) => set(node, 595, 65 + index * 116));
   const middle = 65 + Math.max(0, markets.length - 1) * 58;
   // Shared markets give several vaults the same ideal anchor. Keep each lane
   // collision-free so every affected position remains visible in Impact View.
-  for (const [type, x] of [['Vault', 240], ['Position', 25]] as const) {
+  for (const [type, x] of [['Vault', 310], ['Position', 25]] as const) {
     const anchors = graph.nodes.filter((node) => node.type === type).map((node, index) => ({
       node,
       anchor: mean((outgoing.get(node.id) || []).map((id) => placed.get(id)?.y).filter((y): y is number => y != null), 65 + index * 116),
@@ -31,9 +31,9 @@ export function layoutGraph(graph: Graph) {
     }
   }
   const lanes: Array<[string[], number]> = [
-    [['CollateralToken', 'LoanToken'], 685],
-    [['Oracle'], 905],
-    [['OracleFeed', 'OracleVault', 'BackingAsset', 'IssuerCustodian', 'Blockchain'], 1125],
+    [['CollateralToken', 'LoanToken'], 880],
+    [['Oracle'], 1165],
+    [['OracleFeed', 'OracleVault', 'BackingAsset', 'IssuerCustodian', 'Blockchain'], 1450],
   ];
   for (const [types, x] of lanes) {
     const anchor = (node: GraphNode) => mean((incoming.get(node.id) || []).map((id) => placed.get(id)?.y).filter((y): y is number => y != null), middle);
@@ -53,14 +53,14 @@ export function layoutGraph(graph: Graph) {
       const parents = (incoming.get(id) || []).map((parent) => placed.get(parent)).filter((node): node is PlacedNode => node != null);
       if (!parents.length) continue;
       const node = graph.nodes.find((item) => item.id === id)!;
-      set(node, Math.max(...parents.map((parent) => parent.x)) + 220, mean(parents.map((parent) => parent.y), middle));
+      set(node, Math.max(...parents.map((parent) => parent.x)) + 285, mean(parents.map((parent) => parent.y), middle));
       remaining.delete(id); advanced = true;
     }
     if (!advanced) break;
   }
   for (const id of remaining) {
     const node = graph.nodes.find((item) => item.id === id)!;
-    set(node, 1125, middle);
+    set(node, 1450, middle);
   }
   const nodes = [...placed.values()];
   return { nodes, byId: placed, width: Math.max(350, ...nodes.map((node) => node.x + node.width + 35)), height: Math.max(400, ...nodes.map((node) => node.y + node.height + 50)) };

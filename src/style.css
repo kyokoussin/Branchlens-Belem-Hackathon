@@ -119,6 +119,8 @@ footer { margin: 20px 0 0; text-align: center; }
 .graph-line.dimmed { opacity: .15; }
 .graph-line.incident { stroke: #cf9552; stroke-width: 3; }
 .graph-line.documented { stroke-dasharray: 5 4; }
+.graph-edge-share { fill: #17344a; font-size: 12px; font-weight: 800; paint-order: stroke; stroke: #f8fafb; stroke-width: 5px; stroke-linejoin: round; }
+.graph-edge.dimmed .graph-edge-share { opacity: .3; }
 .map-node { position: absolute; display: flex; flex-direction: column; justify-content: center; gap: 3px; text-align: left; padding: 8px 10px; background: #fff; border: 1px solid #cbd5dd; border-radius: 7px; box-shadow: 0 2px 4px rgb(31 38 50 / 6%); overflow: hidden; white-space: nowrap; }
 .map-node span { color: #66788a; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
 .map-node strong { display: block; overflow: hidden; text-overflow: ellipsis; color: #253345; font-size: 13px; }
