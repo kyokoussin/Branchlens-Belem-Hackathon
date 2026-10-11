@@ -10,7 +10,7 @@ import { buildImpactIndex } from './_portfolioImpact.mjs';
 const money = (number) => new Decimal(number).toDecimalPlaces(2).toFixed(2);
 const monitoringBaseline = new Map();
 const fetchMorphoSubject = (address, chainId) => address.length === 66 ? fetchMorphoMarket(address, chainId) : fetchMorphoVault(address, chainId);
-const analyzeSubject = (entry, amountUsd, address) => address.length === 66 ? analyzeMarket(entry.raw, entry.provenance, amountUsd) : analyze(entry.raw, entry.provenance, amountUsd);
+const analyzeSubject = (entry, position) => position.address.length === 66 ? analyzeMarket(entry.raw, entry.provenance, position.amountUsd, { positionRole: position.positionType === 'borrow' ? 'BORROWER' : 'SUPPLIER' }) : analyze(entry.raw, entry.provenance, position.amountUsd);
 
 export function addGraphImpact(analysis) {
   const { graph, vault, exposure } = analysis;
@@ -54,7 +54,7 @@ export async function buildPortfolio({ source = 'auto', scenario = false, snapsh
         for (let attempt = 0; attempt < 2; attempt++) {
           try {
             entry = await fetchVault(position.address, position.chainId || 1);
-            analyzeSubject(entry, position.amountUsd, position.address);
+            analyzeSubject(entry, position);
             if (attempt) warning = 'An initially inconsistent API response was replaced by a fresh, validated response.';
             break;
           } catch (error) {
@@ -71,8 +71,8 @@ export async function buildPortfolio({ source = 'auto', scenario = false, snapsh
       if (!stored) throw new DataError(`No verified historical snapshot for ${position.id}.`);
       entry = { raw: stored.raw, provenance: { ...stored.provenance, retrievedAt: stored.provenance.retrievedAt, snapshotCapturedAt: stored.capturedAt || snapshot.capturedAt } };
     }
-    const analysis = addGraphImpact(addDocumentedCbbtcDependencies(formatIncidents(analyzeSubject(entry, position.amountUsd, position.address))));
-    analysis.graph.nodes = analysis.graph.nodes.map((node) => node.type === 'Position' ? { ...node, label: position.name || analysis.vault.name } : node);
+    const analysis = addGraphImpact(addDocumentedCbbtcDependencies(formatIncidents(analyzeSubject(entry, position))));
+    analysis.graph.nodes = analysis.graph.nodes.map((node) => node.type === 'Position' ? { ...node, label: `${position.name || analysis.vault.name} · simulated ${position.positionType === 'borrow' ? 'borrow' : 'supply'}` } : node);
     if (warning) analysis.vault.warnings.push(warning);
     const previous = monitoringBaseline.get(position.id);
     const current = {
@@ -86,8 +86,8 @@ export async function buildPortfolio({ source = 'auto', scenario = false, snapsh
       previous.findingKeys !== current.findingKeys ? 'Structural rule outcomes changed' : null,
     ].filter(Boolean) : [];
     if (mode === 'LIVE_API') monitoringBaseline.set(position.id, current);
-    const simulation = scenario ? simulateCbbtcDepeg(analysis) : null;
-    return { id: position.id, name: position.name || analysis.vault.name, portfolioId: position.portfolioId || 'demo', chainId: position.chainId || 1, address: position.address, description: position.description || '', amountUsd: money(position.amountUsd), dataMode: mode, snapshotCapturedAt: mode === 'SAVED_HISTORICAL_SNAPSHOT' ? entry.provenance.snapshotCapturedAt : null, changes, analysis, simulation, livePriceSignal: evaluatePriceDeviation({ baseline: null, observed: null, provenance: null }) };
+    const simulation = scenario && position.positionType !== 'borrow' ? simulateCbbtcDepeg(analysis) : null;
+    return { id: position.id, name: position.name || analysis.vault.name, portfolioId: position.portfolioId || 'demo', chainId: position.chainId || 1, address: position.address, description: position.description || '', amountUsd: money(position.amountUsd), positionType: position.positionType === 'borrow' ? 'borrow' : 'supply', borrowDebtUsd: position.positionType === 'borrow' ? money(position.borrowDebtUsd) : null, dataMode: mode, snapshotCapturedAt: mode === 'SAVED_HISTORICAL_SNAPSHOT' ? entry.provenance.snapshotCapturedAt : null, changes, analysis, simulation, livePriceSignal: evaluatePriceDeviation({ baseline: null, observed: null, provenance: null }) };
   }));
   return aggregateLoadedPortfolio(loaded, scenario, snapshot.capturedAt);
 }

@@ -63,6 +63,54 @@ export const MARKET_QUERY = `query MarketRiskSnapshot($marketId: String!, $chain
   }
 }`;
 
+export const MARKET_CATALOG_QUERY = `query BranchLensMarketCatalog($first: Int, $skip: Int, $where: MarketFilters) {
+  markets(first: $first, skip: $skip, orderBy: SupplyAssetsUsd, orderDirection: Desc, where: $where) {
+    items {
+      marketId chain { id } lltv irmAddress
+      oracle { address type }
+      loanAsset { address symbol decimals }
+      collateralAsset { address symbol decimals }
+      state { supplyAssetsUsd borrowAssetsUsd liquidityAssetsUsd utilization }
+    }
+  }
+}`;
+
+export async function fetchMorphoMarketCatalog({ chainId = 1, skip = 0, limit = 50 } = {}) {
+  if (![1, 8453].includes(chainId) || !Number.isInteger(skip) || skip < 0 || !Number.isInteger(limit) || limit < 1 || limit > 100) throw new SourceError('Invalid market catalog request.', 'INVALID_REQUEST');
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 12000);
+  let payload;
+  try {
+    const response = await fetch(API, {
+      method: 'POST', headers: { 'content-type': 'application/json', accept: 'application/json' },
+      body: JSON.stringify({ query: MARKET_CATALOG_QUERY, variables: { first: limit, skip, where: { chainId_in: [chainId], listed: true } } }),
+      signal: controller.signal,
+    });
+    if (!response.ok) throw new SourceError(`Morpho market catalog returned HTTP ${response.status}.`, response.status === 429 ? 'RATE_LIMITED' : 'SOURCE_UNAVAILABLE');
+    payload = await response.json();
+  } catch (error) {
+    if (error instanceof SourceError) throw error;
+    throw new SourceError(error.name === 'AbortError' ? 'Morpho market catalog timed out.' : 'Morpho market catalog could not be reached.');
+  } finally { clearTimeout(timeout); }
+  if (payload.errors?.length) throw new SourceError(`Morpho rejected the market catalog query: ${payload.errors[0].message}`);
+  if (!Array.isArray(payload.data?.markets?.items)) throw new SourceError('Morpho market catalog response was malformed.', 'INVALID_SOURCE_DATA');
+  const items = payload.data.markets.items.filter((row) => MARKET_ID.test(row?.marketId || '') && row.chain?.id === chainId
+    && ADDRESS.test(row.loanAsset?.address || '') && ADDRESS.test(row.collateralAsset?.address || '')
+    && Number.isInteger(row.loanAsset?.decimals) && Number.isInteger(row.collateralAsset?.decimals)).map((row) => ({
+      chainId, marketId: row.marketId.toLowerCase(),
+      collateral: { address: row.collateralAsset.address.toLowerCase(), symbol: row.collateralAsset.symbol || 'Unknown', decimals: row.collateralAsset.decimals },
+      loan: { address: row.loanAsset.address.toLowerCase(), symbol: row.loanAsset.symbol || 'Unknown', decimals: row.loanAsset.decimals },
+      oracleAddress: ADDRESS.test(row.oracle?.address || '') ? row.oracle.address.toLowerCase() : null,
+      oracleType: row.oracle?.type || null, irmAddress: ADDRESS.test(row.irmAddress || '') ? row.irmAddress.toLowerCase() : null,
+      lltv: row.lltv == null ? null : String(row.lltv),
+      supplyUsd: row.state?.supplyAssetsUsd == null ? null : String(row.state.supplyAssetsUsd),
+      borrowUsd: row.state?.borrowAssetsUsd == null ? null : String(row.state.borrowAssetsUsd),
+      liquidityUsd: row.state?.liquidityAssetsUsd == null ? null : String(row.state.liquidityAssetsUsd),
+      utilization: row.state?.utilization == null ? null : String(row.state.utilization),
+    }));
+  return { items, nextSkip: payload.data.markets.items.length === limit ? skip + limit : null, retrievedAt: new Date().toISOString(), source: API };
+}
+
 export class SourceError extends Error {
   constructor(message, code = 'SOURCE_UNAVAILABLE') {
     super(message);

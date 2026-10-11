@@ -4,7 +4,7 @@ import { aggregateLoadedPortfolio, buildPortfolio } from '../api/_portfolioEngin
 import type { PortfolioData } from './model';
 
 export type ManagedPortfolio = { id: string; name: string };
-export type ManagedPosition = { id: string; name: string; address: string; chainId: 1 | 8453; amountUsd: string; portfolioId: string; description: string };
+export type ManagedPosition = { id: string; name: string; address: string; chainId: 1 | 8453; amountUsd: string; portfolioId: string; description: string; positionType?: 'supply' | 'borrow'; borrowDebtUsd?: string };
 export type WorkspaceConfig = { version: 1; portfolios: ManagedPortfolio[]; positions: ManagedPosition[] };
 export type SourceMode = 'auto' | 'snapshot';
 type RawEntry = { id: string; address: string; chainId?: number; raw: unknown; provenance: Record<string, unknown>; capturedAt?: string };
@@ -25,7 +25,7 @@ export function loadWorkspace(): WorkspaceConfig {
     if (!parsed || parsed.version !== 1 || !Array.isArray(parsed.portfolios) || !Array.isArray(parsed.positions) || !parsed.portfolios.length) return defaultWorkspace();
     const ids = new Set(parsed.portfolios.map((item) => item.id));
     if (ids.size !== parsed.portfolios.length || parsed.portfolios.some((item) => !item.id || !item.name?.trim())) return defaultWorkspace();
-    if (new Set(parsed.positions.map((item) => item.id)).size !== parsed.positions.length || parsed.positions.some((item) => !item.id || !ids.has(item.portfolioId) || !validIdentifier(item.address) || ![1, 8453].includes(item.chainId) || !validAmount(item.amountUsd))) return defaultWorkspace();
+    if (new Set(parsed.positions.map((item) => item.id)).size !== parsed.positions.length || parsed.positions.some((item) => !item.id || !ids.has(item.portfolioId) || !validIdentifier(item.address) || ![1, 8453].includes(item.chainId) || !validAmount(item.amountUsd) || (item.positionType != null && !['supply', 'borrow'].includes(item.positionType)) || (item.positionType === 'borrow' && (item.address.length !== 66 || !validAmount(item.borrowDebtUsd || ''))))) return defaultWorkspace();
     return parsed;
   } catch { return defaultWorkspace(); }
 }

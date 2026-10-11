@@ -36,4 +36,19 @@ describe('direct Morpho market holdings', () => {
       `position:assumed:market:1:${marketId}`, marketNodeId, `token:1:${rawMarket.collateralAsset.address.toLowerCase()}`,
     ]);
   });
+
+  it('connects simulated supply and borrow positions to one real market without applying supplier liquidity risk to the borrower', async () => {
+    const positions = [
+      { id: 'supply', name: 'My supply', portfolioId: 'demo', address: marketId, chainId: 1, amountUsd: '1000', positionType: 'supply', description: '' },
+      { id: 'borrow', name: 'My borrow', portfolioId: 'demo', address: marketId, chainId: 1, amountUsd: '2000', borrowDebtUsd: '1000', positionType: 'borrow', description: '' },
+    ];
+    const snapshot = { ...baseline, positions: positions.map((item) => ({ ...marketEntry, id: item.id })) };
+    const result = await buildPortfolio({ source: 'snapshot', scenario: false, snapshot, positions });
+    expect(result.portfolioGraph.nodes.filter((node) => node.id === `market:1:${marketId}`)).toHaveLength(1);
+    expect(result.portfolioGraph.edges.some((edge) => edge.type === 'BORROWS_FROM')).toBe(true);
+    expect(result.portfolioGraph.edges.some((edge) => edge.type === 'SUPPLIES_TO' && edge.from.startsWith('position:'))).toBe(true);
+    expect(result.impactIndex[`market:1:${marketId}`].affectedPositionCount).toBe(2);
+    expect(result.impactIndex[`market:1:${marketId}`].uniqueCapitalExposedUsd).toBe('3000.00');
+    expect(result.positions.find((item) => item.id === 'borrow').analysis.findings.some((item) => item.detector === 'WITHDRAWAL_LIQUIDITY_CONSTRAINT')).toBe(false);
+  });
 });

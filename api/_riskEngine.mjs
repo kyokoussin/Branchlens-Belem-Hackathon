@@ -160,13 +160,13 @@ export function buildGraph(vault, { positionRole = 'SUPPLIER' } = {}) {
       }
     }
   }
-  return { nodes, edges, coverage: marketPosition ? 'Direct Morpho market supply and immutable market parameters; borrower health, issuer, governance and external protocol branches are NOT_ANALYZED.' : 'Funded Morpho V1 allocations only; issuer, backing, governance and external protocol branches are NOT_ANALYZED.' };
+  return { nodes, edges, coverage: marketPosition ? `${positionRole === 'BORROWER' ? 'Simulated collateral in a real Morpho market' : 'Direct Morpho market supply'} and verified market parameters; position balances and external protocol branches are analyst assumptions or NOT_ANALYZED.` : 'Funded Morpho V1 allocations only; issuer, backing, governance and external protocol branches are NOT_ANALYZED.' };
 }
 
-export function calculateExposure(vault, positionUsd) {
+export function calculateExposure(vault, positionUsd, { positionRole = 'SUPPLIER' } = {}) {
   let principal;
   try { principal = D(positionUsd); } catch { throw new DataError('Enter a valid positive assumed position amount.'); }
-  if (!principal.isFinite() || principal.lte(0) || principal.gt(vault.totalUsd)) throw new DataError('Assumed position must be positive and no larger than the vault total.');
+  if (!principal.isFinite() || principal.lte(0) || (positionRole !== 'BORROWER' && principal.gt(vault.totalUsd))) throw new DataError('Assumed position must be positive and, for supply, no larger than the reported market or vault total.');
   const total = D(vault.totalUsd);
   const rows = vault.allocations.map((item) => ({
     marketId: item.marketId,
@@ -198,12 +198,13 @@ export function detectRisks(vault, exposure, options = {}) {
   const liquidity = vault.liquidityUsd == null ? null : D(vault.liquidityUsd);
   const liquidityTriggered = liquidity != null && requested.gt(liquidity);
   const marketPosition = vault.version === 'MORPHO_MARKET';
-  findings.push({
+  const borrower = marketPosition && options.positionRole === 'BORROWER';
+  if (!borrower) findings.push({
     id: `liquidity:${vault.chainId}:${vault.address}`, detector: 'WITHDRAWAL_LIQUIDITY_CONSTRAINT',
-    category: 'LIQUIDITY_CONSTRAINT', status: liquidity == null ? 'UNKNOWN' : liquidityTriggered ? 'TRIGGERED' : 'NOT_TRIGGERED',
+    category: 'LIQUIDITY_CONSTRAINT', status: borrower || liquidity == null ? 'UNKNOWN' : liquidityTriggered ? 'TRIGGERED' : 'NOT_TRIGGERED',
     signalType: liquidityTriggered ? 'STRUCTURAL_WARNING' : 'CAPACITY_CHECK', severity: liquidityTriggered ? 'warning' : 'info',
     title: liquidityTriggered ? `Reported ${marketPosition ? 'market' : 'vault'} liquidity is below requested withdrawal` : `Reported ${marketPosition ? 'market' : 'vault'} liquidity check`,
-    description: `Morpho reports global ${marketPosition ? 'market' : 'vault'} liquidity, not a wallet-specific redeemability or executable withdrawal quote.`,
+    description: borrower ? 'Borrower collateral release depends on debt repayment, not market supply liquidity. No exit capacity is inferred.' : `Morpho reports global ${marketPosition ? 'market' : 'vault'} liquidity, not a wallet-specific redeemability or executable withdrawal quote.`,
     subjectId: marketPosition ? `market:${vault.chainId}:${vault.address}` : `vault:${vault.chainId}:${vault.address}`,
     affectedMarketIds: liquidityTriggered ? vault.allocations.map((a) => a.marketId) : [],
     capitalExposedUsd: liquidityTriggered ? exposure.assumedPrincipalUsd : '0.00',
@@ -259,8 +260,8 @@ export function analyze(raw, provenance, positionUsd = '1000000', options = {}) 
 
 export function analyzeMarket(raw, provenance, positionUsd = '1000000', options = {}) {
   const market = normalizeMarket(raw, provenance);
-  const graph = buildGraph(market);
-  const exposure = calculateExposure(market, positionUsd);
+  const graph = buildGraph(market, { positionRole: options.positionRole });
+  const exposure = calculateExposure(market, positionUsd, { positionRole: options.positionRole });
   const findings = detectRisks(market, exposure, options);
   const affectedIds = findings.filter((item) => item.status === 'TRIGGERED').flatMap((item) => item.affectedMarketIds);
   const uniqueAffectedUsd = unionExposure(exposure, affectedIds);

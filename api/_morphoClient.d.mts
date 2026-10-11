@@ -1,2 +1,4 @@
 export function fetchMorphoVault(address: string, chainId?: number): Promise<{ raw: unknown; provenance: Record<string, unknown> }>;
 export function fetchMorphoMarket(marketId: string, chainId?: number): Promise<{ raw: unknown; provenance: Record<string, unknown> }>;
+export type CatalogMarket = { chainId: 1 | 8453; marketId: string; collateral: { address: string; symbol: string; decimals: number }; loan: { address: string; symbol: string; decimals: number }; oracleAddress: string | null; oracleType: string | null; irmAddress: string | null; lltv: string | null; supplyUsd: string | null; borrowUsd: string | null; liquidityUsd: string | null; utilization: string | null };
+export function fetchMorphoMarketCatalog(input?: { chainId?: 1 | 8453; skip?: number; limit?: number }): Promise<{ items: CatalogMarket[]; nextSkip: number | null; retrievedAt: string; source: string }>;
