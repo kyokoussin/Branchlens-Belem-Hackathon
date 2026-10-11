@@ -16,8 +16,9 @@ else
 fi
 
 if [[ ! -d node_modules ]]; then "$pnpm_cmd" install --frozen-lockfile; fi
-if [[ ! -f dist/index.html ]]; then "$pnpm_cmd" build; fi
+"$pnpm_cmd" build
 
-echo 'Opening BranchLens at http://127.0.0.1:8780'
-( sleep 2; open 'http://127.0.0.1:8780' ) &
-"$pnpm_cmd" start
+port="$(node -e 'const net = require("node:net"); let port = 8780; function probe() { const server = net.createServer(); server.once("error", () => { port++; probe(); }); server.listen(port, "127.0.0.1", () => server.close(() => process.stdout.write(String(port)))); } probe();')"
+echo "Opening BranchLens at http://127.0.0.1:$port"
+( sleep 2; open "http://127.0.0.1:$port" ) &
+PORT="$port" "$pnpm_cmd" start

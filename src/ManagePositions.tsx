@@ -10,7 +10,7 @@ const blank = (portfolioId: string): Draft => ({ name: '', address: '', chainId:
 const money = (value: string | null | undefined) => value == null ? 'Unavailable' : new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(Number(value));
 const shortId = (value: string) => value.length > 20 ? `${value.slice(0, 10)}…${value.slice(-6)}` : value;
 
-export function ManagePositions({ config, data, onCommit }: { config: WorkspaceConfig; data: PortfolioData | null; onCommit: (next: WorkspaceConfig, verify?: { address: string; chainId: 1 | 8453 }) => Promise<void> }) {
+export function ManagePositions({ config, data, onCommit }: { config: WorkspaceConfig; data: PortfolioData | null; onCommit: (next: WorkspaceConfig, verify?: { address: string; chainId: 1 | 8453 }) => Promise<string | undefined> }) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draft, setDraft] = useState<Draft>(() => blank(config.portfolios[0]?.id || 'demo'));
   const [portfolioName, setPortfolioName] = useState('');
@@ -81,8 +81,8 @@ export function ManagePositions({ config, data, onCommit }: { config: WorkspaceC
   async function apply(next: WorkspaceConfig, verify?: { address: string; chainId: 1 | 8453 }) {
     setWorking(true); setError(''); setMessage('');
     try {
-      await onCommit(next, verify);
-      setMessage('Saved. The simulated position and verified market dependencies now appear in the portfolio graph.');
+      const syncNotice = await onCommit(next, verify);
+      setMessage(syncNotice || 'Saved. The simulated position and verified market dependencies now appear in the portfolio graph.');
       setEditingId(null); setDraft(blank(next.portfolios[0]?.id || 'demo')); setSelectedMarket(null); setVerifiedMarketId('');
     } catch (cause) { setError(cause instanceof Error ? cause.message : 'Could not save the change.'); }
     finally { setWorking(false); }

@@ -3,6 +3,7 @@ import { GraphExplorer } from './GraphExplorer';
 import { ManagePositions } from './ManagePositions';
 import { CrisisWorkflow } from './CrisisWorkflow';
 import { SearchFilters, emptySearch, filterPositions, searchActive, type SearchState } from './SearchFilters';
+import { syncWorkspace } from './workspaceSync';
 import { aggregateLoadedPortfolio } from '../api/_portfolioEngine.mjs';
 import { buildManagedPortfolio, cacheKey, loadBaseSnapshot, loadMorphoCache, loadWorkspace, saveMorphoCache, saveWorkspace, scopePortfolio, verifySubject, type WorkspaceConfig } from './portfolioWorkspace';
 import type { GraphNode, PortfolioData, Position } from './model';
@@ -131,12 +132,10 @@ export default function App() {
     const cache = loadMorphoCache();
     if (verify) cache[cacheKey(verify.chainId, verify.address)] = await verifySubject(verify.address, verify.chainId);
     const computed = await buildManagedPortfolio(next, baseline, cache, 'snapshot', scenario);
-    if (!staticHost) {
-      const response = await fetch('/api/workflow?action=workspace', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(next) });
-      if (!response.ok) { const result = await response.json(); throw new Error(result.error || 'Backend portfolio save failed.'); }
-    }
+    // Simulated holdings belong to this browser. A missing workflow API must not block them.
     saveMorphoCache(cache); saveWorkspace(next); setWorkspaceConfig(next); setData(computed); setError('');
     if (!computed.positions.some((position) => position.id === selectedPositionId)) setSelectedPositionId(computed.positions[0]?.id || '');
+    return staticHost ? undefined : syncWorkspace(next);
   }
   function openIncidentImpact() { if (data?.portfolioIncident) openImpact(data.portfolioIncident.dependencyNodeId); }
   function startScenario() { replayStartedAt.current = new Date().toISOString(); setScenario(true); setCopied(false); const cbBtc = data?.portfolioGraph.nodes.find((node) => node.type === 'CollateralToken' && node.label.toLowerCase() === 'cbbtc'); if (cbBtc) { setSelectedNodeId(cbBtc.id); setGraphView('impact'); setScreen(staticHost ? 'explore' : 'crisis'); window.scrollTo({ top: 0, behavior: 'smooth' }); } }
